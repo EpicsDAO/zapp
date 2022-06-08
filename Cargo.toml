@@ -1,0 +1,9 @@
+[package]
+name = "zapp"
+description = "Web3 GraphQL API Framework"
+version = "0.1.0"
+authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
+edition = "2021"
+license = "Apache-2.0"
+
+[dependencies]
