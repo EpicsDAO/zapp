@@ -1,6 +1,6 @@
 [package]
 name = "zapp"
-description = "Web3 GraphQL API Framework"
+description = "Rust Serverless Framework"
 version = "0.1.0"
 authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
 edition = "2021"
