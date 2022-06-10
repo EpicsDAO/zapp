@@ -27,7 +27,7 @@ pub async fn process_docker_psql() {
       "--rm",
       "-d",
       "--name",
-      "epics-psql",
+      "zapp-psql",
       "-p",
       "5432:5432",
       "-v",
@@ -37,8 +37,8 @@ pub async fn process_docker_psql() {
       "-e",
       "POSTGRES_PASSWORD=postgres",
       "-e",
-      "POSTGRES_DB=epics_db",
-      "--network=epics",
+      "POSTGRES_DB=zapp_db",
+      "--network=zapp",
       "postgres:14.3-alpine",
     ])
     .output()
