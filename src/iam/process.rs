@@ -195,3 +195,18 @@ pub async fn process_enable_permissions(project_id: &str) {
     }
   }
 }
+
+
+pub async fn set_keyfile_to_gh_secret() {
+  let output = Command::new("gh")
+    .args(&[
+      "secret",
+      "set",
+      "ZAPP_GCP_SA_KEY",
+      "<",
+      "./keyfile.json"
+    ])
+    .output()
+    .await;
+  println!("{:?}", &output);
+}

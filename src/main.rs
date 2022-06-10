@@ -44,6 +44,7 @@ async fn main() {
                     .await;
                     process_add_roles(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
                     process_enable_permissions(gcp.project_id.as_str()).await;
+                    set_keyfile_to_gh_secret().await;
                     let log = "Your IAM is all set!";
                     log_success(log).await;
                 }
