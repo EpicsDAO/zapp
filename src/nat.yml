@@ -1,0 +1,51 @@
+name: EpicService
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - id: auth
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.EPICS_GCP_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        install_components: 'beta'
+    
+    - name: Configure Docker
+      run: gcloud auth configure-docker --quiet
+    
+    - name: Build Docker container
+      run: docker build . -t eu.gcr.io/${{ secrets.EPICS_GCP_PROJECT_ID }}/${{secrets.EPICS_SERVICE_NAME}}
+
+    - name: Push to Container Resistory
+      run: docker push eu.gcr.io/${{ secrets.EPICS_GCP_PROJECT_ID }}/${{secrets.EPICS_SERVICE_NAME}}
+
+    - name: Deploy to Cloud Run
+      run: |
+          gcloud beta run deploy epics-${{ secrets.EPICS_SERVICE_NAME }} \
+            --quiet \
+            --service-account=${{ secrets.EPICS_SERVICE_NAME }}@${{ secrets.EPICS_GCP_PROJECT_ID }}.iam.gserviceaccount.com \
+            --image=eu.gcr.io/${{ secrets.EPICS_GCP_PROJECT_ID }}/${{ secrets.EPICS_SERVICE_NAME }} \
+            --memory=8Gi \
+            --cpu=2 \
+            --vpc-connector="${{ secrets.EPICS_SERVICE_NAME }}" \
+            --vpc-egress=all \
+            --region=${{ secrets.EPICS_GCP_REGION }} \
+            --allow-unauthenticated \
+            --platform=managed \
+            --no-cpu-throttling \
+            --execution-environment=gen2 \
+            --concurrency=80 \
+            --port=8080 \
+            --set-env-vars="EPICS_GCP_PROJECT_ID=${{ secrets.EPICS_GCP_PROJECT_ID }}" \
+            --set-env-vars="SOLANA_KEY=${{ secrets.SOLANA_KEY }}"

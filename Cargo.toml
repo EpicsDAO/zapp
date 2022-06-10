@@ -1,9 +1,20 @@
 [package]
 name = "zapp"
 description = "Rust Serverless Framework"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
 edition = "2021"
 license = "Apache-2.0"
 
+[[bin]]
+name = "zapp"
+path = "src/main.rs"
+
 [dependencies]
+clap = { version = "3.1.15", features = ["derive", "cargo"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = "1.0.81"
+serde_yaml = "0.8.24"
+console = "0.15.0"
+regex = "1.5.6"

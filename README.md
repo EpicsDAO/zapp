@@ -3,7 +3,26 @@
 Rust Serverless Framework
 
 ## Installation
-Coming soon..
+
+```bash
+cargo install zapp
+```
+
+## Usage
+
+Create your app
+```bash
+zapp new zapp-api
+cd zapp-api
+```
+
+Prepare environment
+```bash
+zapp compute setup
+```
+
+coming soon...
+
 
 ## Contributing
 
