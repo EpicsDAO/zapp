@@ -1,4 +1,11 @@
 use tokio::process::Command;
+use crate::style_print::*;
+use regex::Regex;
+use std::str;
+
+fn regex(re_str: &str) -> Regex {
+  Regex::new(re_str).unwrap()
+}
 
 pub async fn process_create_network(project_id: &str, service_name: &str) {
   let output = Command::new("gcloud")
@@ -13,7 +20,21 @@ pub async fn process_create_network(project_id: &str, service_name: &str) {
         ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Network!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
@@ -33,7 +54,21 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Firewall!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
@@ -76,7 +111,21 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Subnet!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_connector(project_id: &str, service_name: &str, region: &str) {
@@ -100,7 +149,21 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created VPC Connector!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_router(project_id: &str, service_name: &str, region: &str) {
@@ -120,7 +183,21 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Router!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_external_ip(project_id: &str, service_name: &str, region: &str) {
@@ -139,7 +216,21 @@ pub async fn process_create_external_ip(project_id: &str, service_name: &str, re
         ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created External IP!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
 
 pub async fn process_create_nat(project_id: &str, service_name: &str, region: &str) {
@@ -167,5 +258,19 @@ pub async fn process_create_nat(project_id: &str, service_name: &str, region: &s
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Cloud NAT!").await;
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
 }
