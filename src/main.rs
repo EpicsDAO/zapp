@@ -173,12 +173,10 @@ async fn main() {
             let g_cmd = g.command.unwrap_or(GCommands::Help);
             match g_cmd {
                 GCommands::Model { model } => {
-                    let dir = "src/graphql/mutation/";
-                    println!("{:?}", read_dir(dir).await);
-                    // process_create_migration(&model).await;
-                    // process_create_entity(&model).await;
-                    // process_create_mutation(&model).await;
-                    // process_create_query(&model).await;
+                    process_create_migration(&model).await;
+                    process_create_entity(&model).await;
+                    process_create_mutation(&model).await;
+                    process_create_query(&model).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";

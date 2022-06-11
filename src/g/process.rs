@@ -248,3 +248,8 @@ pub async fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
         })
         .collect())
 }
+
+pub async fn process_create_mutation_route() {
+    let dir = "src/graphql/mutation/";
+    println!("{:?}", read_dir(dir).await);
+}

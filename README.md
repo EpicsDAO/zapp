@@ -1,3 +1,4 @@
+[![ZAPP](https://storage.googleapis.com/zapp-bucket/img/ZAPP-logo.jpeg)]
 <p align="center">
   <a href="https://twitter.com/intent/follow?screen_name=EpicsDAO">
     <img src="https://img.shields.io/twitter/follow/EpicsDAO.svg?label=Follow%20@EpicsDAO" alt="Follow @EpicsDAO" />
