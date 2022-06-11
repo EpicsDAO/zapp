@@ -1,11 +1,14 @@
 [package]
 name = "zapp"
 description = "Rust Serverless Framework"
-version = "0.2.2"
+version = "0.2.3"
 authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
 edition = "2021"
 license = "Apache-2.0"
 keywords = ["Serverless", "GraphQL", "Async", "PostgreSQL", "Framework"]
+homepage = "https://github.com/EpicsDAO/zapp"
+repository = "https://github.com/EpicsDAO/zapp"
+category = "framework"
 
 [[bin]]
 name = "zapp"
