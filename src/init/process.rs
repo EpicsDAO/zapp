@@ -177,3 +177,43 @@ pub async fn git_init(app_name: &str) {
     Err(err) => println!("error = {:?}", err)
   }
 }
+
+pub async fn underscore(s: &str) -> String {
+  s.replace("-", "_")
+}
+
+pub async fn create_dockerfile(app_name: &str) {
+  let filename = format!("{}/Dockerfile", app_name);
+  let underscore_app_name = underscore(app_name).await;
+  fs::create_dir_all(&filename).unwrap_or_else(|why| {
+    println!("! {:?}", why.kind());
+  });
+  let file_content = format!("FROM rust:1.61 as build
+RUN USER=root cargo new --bin {}
+WORKDIR /{}
+COPY entity entity
+COPY migration migration
+COPY Cargo.toml Cargo.toml
+RUN cargo build --release
+COPY ./src ./src
+COPY entity/src entity/src
+COPY migration/src migration/src
+RUN rm -f target/release/deps/{}*
+RUN cargo build --release
+
+FROM debian:11.3
+COPY --from=build /{}/target/release/{} .
+
+CMD [\"./{}\"]", app_name, app_name, &underscore_app_name, app_name, app_name, app_name);
+  let file_exist = Path::new(&filename).exists();
+  match file_exist {
+    true => {
+      log_error("Error: File already exist!").await;
+    }
+    false => {
+      let mut file = fs::File::create(&filename).unwrap();
+      file.write_all(file_content.as_bytes()).unwrap();
+      log_success("Successfully created Dockerfile!").await;
+    }
+  }
+}

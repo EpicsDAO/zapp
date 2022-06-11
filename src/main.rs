@@ -24,8 +24,9 @@ async fn main() {
         Commands::New { app_name } => {
             dl_zapp(&app_name).await;
             unzip_zapp(&app_name).await;
+            create_dockerfile(&app_name).await;
             git_init(&app_name).await;
-            let msg = format!("Successfully created your zapp!\n\n`cd {}`", &app_name);
+            let msg = format!("Successfully created your zapp!\n\n`cd {}`\n`zapp docker psql`\n`cargo run`", &app_name);
             log_success(&msg).await;
         }
         Commands::Iam(iam) => {
