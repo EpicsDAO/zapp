@@ -7,4 +7,5 @@ pub mod init;
 pub mod run;
 pub mod docker;
 pub mod sql;
+pub mod g;
 pub mod style_print;

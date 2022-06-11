@@ -1,7 +1,7 @@
 use clap::Parser;
 use zapp::cli::{
     Cli, Commands, ComputeCommands, DockerCommands, GcpConfig, GhCommands, IamCommands,
-    InitCommands, RunCommands, SqlCommands
+    InitCommands, RunCommands, SqlCommands, GCommands
 };
 use zapp::compute::*;
 use zapp::style_print::*;
@@ -11,6 +11,7 @@ use zapp::iam::*;
 use zapp::init::*;
 use zapp::run::*;
 use zapp::sql::*;
+use zapp::g::*;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -163,6 +164,18 @@ async fn main() {
                 }
                 _ => {
                     let log = "To see example;\n\n $gcu sql --help";
+                    log_error(log).await;
+                }
+            }
+        }
+        Commands::G(g) => {
+            let g_cmd = g.command.unwrap_or(GCommands::Help);
+            match g_cmd {
+                GCommands::Model { model } => {
+                    process_create_migration(&model).await;
+                }
+                _ => {
+                    let log = "To see example;\n\n $gcu run --help";
                     log_error(log).await;
                 }
             }

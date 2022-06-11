@@ -26,6 +26,7 @@ pub enum Commands {
     Compute(Compute),
     Docker(Docker),
     Sql(Sql),
+    G(G),
     New {
         app_name: String
     }
@@ -80,6 +81,13 @@ pub struct Sql {
     pub command: Option<SqlCommands>,
 }
 
+#[derive(Debug, Args)]
+#[clap(args_conflicts_with_subcommands = true)]
+pub struct G {
+    #[clap(subcommand)]
+    pub command: Option<GCommands>,
+}
+
 #[derive(Debug, Subcommand)]
 pub enum IamCommands {
     Setup,
@@ -129,5 +137,13 @@ pub enum SqlCommands {
     },
     Restart,
     SetPrivateIp,
+    Help
+}
+
+#[derive(Debug, Subcommand)]
+pub enum GCommands {
+    Model {
+        model: String
+    },
     Help
 }
