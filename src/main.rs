@@ -15,32 +15,25 @@ use zapp::g::*;
 use zapp::db::*;
 use std::fs::File;
 use std::io::BufReader;
-use std::path::Path;
 
 
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
-    let file_name = "gcp_config.json";
-    let file_exist = Path::new(file_name).exists();
-    if file_exist == false {
-        process_init_gcp_config().await;
-    }
-    let f = File::open(file_name).unwrap();
-    let reader = BufReader::new(f);
-    let gcp: GcpConfig = serde_json::from_reader(reader).unwrap();
     match cli.command {
         Commands::New { app_name } => {
             dl_zapp(&app_name).await;
             unzip_zapp(&app_name).await;
             git_init(&app_name).await;
-            let msg = "Successfully created your zapp!";
-            log_success(msg).await;
+            let msg = format!("Successfully created your zapp!\n\n`cd {}`", &app_name);
+            log_success(&msg).await;
         }
         Commands::Iam(iam) => {
+            let gcp = get_gcp().await;
             let iam_cmd = iam.command.unwrap_or(IamCommands::Help);
             match iam_cmd {
                 IamCommands::Setup => {
+                    process_init_gcp_config().await;
                     process_create_service_account(
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
@@ -64,6 +57,7 @@ async fn main() {
             }
         }
         Commands::Run(run) => {
+            let gcp = get_gcp().await;
             let run_cmd = run.command.unwrap_or(RunCommands::Help);
             match run_cmd {
                 RunCommands::Build => {
@@ -79,6 +73,7 @@ async fn main() {
             }
         }
         Commands::Gh(gh) => {
+            let gcp = get_gcp().await;
             let gh_cmd = gh.command.unwrap_or(GhCommands::Help);
             match gh_cmd {
                 GhCommands::AddEnv => {
@@ -106,6 +101,7 @@ async fn main() {
             }
         }
         Commands::Compute(compute) => {
+            let gcp = get_gcp().await;
             let compute_cmd = compute.command.unwrap_or(ComputeCommands::Help);
             match compute_cmd {
                 ComputeCommands::CreateNat => {
@@ -129,6 +125,7 @@ async fn main() {
             }
         }
         Commands::Docker(docker) => {
+            let gcp = get_gcp().await;
             let docker_cmd = docker.command.unwrap_or(DockerCommands::Help);
             match docker_cmd {
                 DockerCommands::Psql => {
@@ -147,6 +144,7 @@ async fn main() {
             }
         }
         Commands::Sql(sql) => {
+            let gcp = get_gcp().await;
             let sql_cmd = sql.command.unwrap_or(SqlCommands::Help);
             match sql_cmd {
                 SqlCommands::Create => {
@@ -197,6 +195,14 @@ async fn main() {
             }
         }
     }
+}
+
+pub async fn get_gcp() -> GcpConfig {
+    let file_name = "gcp_config.json";
+    let f = File::open(file_name).unwrap();
+    let reader = BufReader::new(f);
+    let gcp: GcpConfig = serde_json::from_reader(reader).unwrap();
+    gcp
 }
 
 pub async fn setup_deployment(gcp: GcpConfig) {
