@@ -185,9 +185,6 @@ pub async fn underscore(s: &str) -> String {
 pub async fn create_dockerfile(app_name: &str) {
   let filename = format!("{}/Dockerfile", app_name);
   let underscore_app_name = underscore(app_name).await;
-  fs::create_dir_all(&filename).unwrap_or_else(|why| {
-    println!("! {:?}", why.kind());
-  });
   let file_content = format!("FROM rust:1.61 as build
 RUN USER=root cargo new --bin {}
 WORKDIR /{}
