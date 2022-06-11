@@ -20,6 +20,13 @@ pub async fn process_docker_push(project_id: &str, service_name: &str) {
   println!("output = {:?}", output);
 }
 
+pub async fn create_docker_network() {
+  let _output = Command::new("docker")
+    .args(&["network", "create", "zapp"])
+    .output()
+    .await;
+}
+
 pub async fn process_docker_psql() {
   let output = Command::new("docker")
     .args(&[

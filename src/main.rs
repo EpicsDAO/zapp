@@ -124,16 +124,18 @@ async fn main() {
             }
         }
         Commands::Docker(docker) => {
-            let gcp = get_gcp().await;
             let docker_cmd = docker.command.unwrap_or(DockerCommands::Help);
             match docker_cmd {
                 DockerCommands::Psql => {
+                    create_docker_network().await;
                     process_docker_psql().await;
                 }
                 DockerCommands::Build => {
+                    let gcp = get_gcp().await;
                     process_docker_build(&gcp.project_id, &gcp.service_name).await;
                 }
                 DockerCommands::Push => {
+                    let gcp = get_gcp().await;
                     process_docker_push(&gcp.project_id, &gcp.service_name).await;
                 }
                 _ => {
