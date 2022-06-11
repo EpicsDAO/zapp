@@ -28,6 +28,13 @@ async fn main() {
     let reader = BufReader::new(f);
     let gcp: GcpConfig = serde_json::from_reader(reader).unwrap();
     match cli.command {
+        Commands::New { app_name } => {
+            dl_zapp(&app_name).await;
+            unzip_zapp(&app_name).await;
+            git_init(&app_name).await;
+            let msg = "Successfully created your zapp!";
+            log_success(msg).await;
+        }
         Commands::Iam(iam) => {
             let iam_cmd = iam.command.unwrap_or(IamCommands::Help);
             match iam_cmd {
@@ -142,6 +149,17 @@ async fn main() {
             match sql_cmd {
                 SqlCommands::Create => {
                     process_create_sql(&gcp.project_id, &gcp.service_name, &gcp.region).await;
+                }
+                SqlCommands::Patch { action } => {
+                    if &action != "start" || &action != "stop" {
+                        panic!("wrong arg!");
+                    } 
+                    process_patch_sql(&gcp.project_id, &gcp.service_name, &action).await;
+                }
+                SqlCommands::Restart => {
+                    let ip = get_instance_ip(&gcp.project_id, &gcp.service_name).await;
+                    println!("{}", ip);
+                    // process_restart_sql(&gcp.project_id, &gcp.service_name).await;
                 }
                 SqlCommands::SetPrivateIp => {
                     process_create_ip_range(&gcp.project_id, &gcp.service_name).await;

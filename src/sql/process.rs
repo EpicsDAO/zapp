@@ -1,4 +1,5 @@
 use tokio::process::Command;
+use crate::style_print::*;
 use console::style;
 use std::io;
 use regex::Regex;
@@ -9,10 +10,7 @@ fn regex(re_str: &str) -> Regex {
 }
 
 pub async fn process_create_sql(project_id: &str, service_name: &str, region: &str) {
-  println!(
-    "📝 {}",
-    style("Please input your DB Root Password:").white().bold()
-  );
+  log_input("Please input your DB Root Password:").await;
   let mut db_password = String::new();
   io::stdin()
     .read_line(&mut db_password)
@@ -61,6 +59,82 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
               "✅ {}",
               style("Successfully created Cloud SQL!").white().bold()
           );
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
+}
+
+pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &str) {
+  let instance_name = String::from(service_name) + "-db";
+  let activation_policy = match action {
+    "start" => {
+      "ALWAYS"
+    }
+    "stop" => {
+      "NEVER"
+    }
+    _ => {
+      panic!("No action name!");
+    }
+  };
+  let output = Command::new("gcloud")
+    .args(&[
+      "sql",
+      "instances",
+      "patch",
+      &instance_name,
+      "--activation-policy",
+      activation_policy,
+      "--project",
+      project_id
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          println!(
+              "✅ {}",
+              style("Successfully patched Cloud SQL!").white().bold()
+          );
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
+}
+
+pub async fn process_restart_sql(project_id: &str, service_name: &str) {
+  let instance_name = String::from(service_name) + "-db";
+  let output = Command::new("gcloud")
+    .args(&[
+      "sql",
+      "instances",
+      "restart",
+      &instance_name,
+      "--project",
+      project_id
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+            panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully restart Cloud SQL!").await
         }
       }
     },
@@ -192,15 +266,49 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
   }
 }
 
-async fn region_to_timezone(region: &str) -> &str {
-  let asia = regex("asia");
-  let eu = regex("europe");
-  let zone = if asia.is_match(region)  {
-    "Asia/Tokyo"
-  } else if eu.is_match(region) {
-    "Europe/Amsterdam"
-  } else {
-    "America/Los_Angeles"
+
+pub async fn get_instance_ip(project_id: &str, service_name: &str) -> String {
+  let instance_name = String::from(service_name) + "-db";
+  let mut _internal_ip = String::new();
+  let output = Command::new("gcloud")
+    .args(&[
+      "sql",
+      "instances",
+      "describe",
+      &instance_name,
+      "--project",
+      project_id,
+      "--format",
+      "value(ipAddresses.ipAddress)"
+    ])
+    .output()
+    .await;
+  let _internal_ip = match &output {
+    Ok(val) => {
+      let ips = str::from_utf8(&val.stdout).unwrap().trim();
+      let ip_array = ips.split(';').fold(Vec::new(), |mut s, i| {
+        s.push(i.to_string());
+        s
+      });
+      ip_array.last().unwrap().clone()
+    },
+    Err(err) => {
+      panic!("{:?}", err)
+    }
   };
-  zone
+  _internal_ip
 }
+
+
+// async fn region_to_timezone(region: &str) -> &str {
+//   let asia = regex("asia");
+//   let eu = regex("europe");
+//   let zone = if asia.is_match(region)  {
+//     "Asia/Tokyo"
+//   } else if eu.is_match(region) {
+//     "Europe/Amsterdam"
+//   } else {
+//     "America/Los_Angeles"
+//   };
+//   zone
+// }

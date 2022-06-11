@@ -1,3 +1,4 @@
+use tokio::process::Command;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
@@ -6,6 +7,12 @@ use std::io::Write;
 use std::path::Path;
 use super::actions_yml::ACTIONS_YML;
 use crate::style_print::*;
+use regex::Regex;
+use std::str;
+
+fn regex(re_str: &str) -> Regex {
+  Regex::new(re_str).unwrap()
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GcpConfig {
@@ -93,5 +100,80 @@ pub async fn build_api_workflow() {
       file.write_all(ACTIONS_YML).unwrap();
       log_success("Successfully created workflow!").await;
     }
+  }
+}
+
+pub async fn dl_zapp(app_name: &str) {
+  let version_range = "v0-1";
+  let zapp_dl_url = format!("https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz", version_range);
+  let output = Command::new("curl")
+    .args(&[
+      "-OL",
+      &zapp_dl_url
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("Received");
+      match rt.is_match(err.unwrap()) {
+        true => {
+          let _ = fs::create_dir(app_name);
+          unzip_zapp(app_name).await;
+        }
+        false => {
+          panic!("{:?}", err.unwrap())
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
+}
+
+
+pub async fn unzip_zapp(app_name: &str) {
+  let filename = "zapp-api.tar.gz";
+  let output = Command::new("tar")
+    .args(&[
+      "-zxvf",
+      &filename,
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("could not");
+      match rt.is_match(err.unwrap()) {
+        true => {
+          panic!("{:?}", err.unwrap())
+        }
+        false => {
+          let _ = fs::rename("zapp-api", app_name);
+          let _ = fs::remove_file(filename);
+        }
+      }
+    },
+    Err(err) => println!("error = {:?}", err)
+  }
+}
+
+pub async fn git_init(app_name: &str) {
+  let output = Command::new("cd")
+    .args(&[
+      &app_name,
+      "&&",
+      "git",
+      "init",
+      "--initial-branch=main"
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(_val) => {
+        // println!("{:?}", val);
+      }
+    Err(err) => println!("error = {:?}", err)
   }
 }

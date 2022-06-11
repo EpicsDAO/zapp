@@ -25,7 +25,10 @@ pub enum Commands {
     Init(Init),
     Compute(Compute),
     Docker(Docker),
-    Sql(Sql)
+    Sql(Sql),
+    New {
+        app_name: String
+    }
 }
 
 #[derive(Debug, Args)]
@@ -121,6 +124,10 @@ pub enum DockerCommands {
 #[derive(Debug, Subcommand)]
 pub enum SqlCommands {
     Create,
+    Patch {
+        action: String
+    },
+    Restart,
     SetPrivateIp,
     Help
 }
