@@ -104,7 +104,7 @@ pub async fn build_api_workflow() {
 }
 
 pub async fn dl_zapp(app_name: &str) {
-  let version_range = "v0-2";
+  let version_range = "v0.2";
   let zapp_dl_url = format!("https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz", version_range);
   let output = Command::new("curl")
     .args(&[

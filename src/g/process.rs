@@ -4,6 +4,9 @@ use std::io::Write;
 use chrono::Local;
 use crate::style_print::*;
 
+use std::io;
+use std::path::Path;
+
 pub async fn process_create_migration(model: &str) {
   let dt = Local::now();
   let filename = format!("m{}{}{}_{}{}{}_create_{}_table", dt.format("%Y"), dt.format("%m"), dt.format("%d"),dt.format("%H"), dt.format("%M"), dt.format("%S"), model);
@@ -231,4 +234,17 @@ impl {}Query {{
   file.write_all(file_content.as_bytes()).unwrap();
   log_success(&format!("Successfully created query file: {}", &file_path)).await;
   log_input("Add your route to:\nsrc/graphql/query/mod.rs\nsrc/graphql/mutation/mod.rs").await;
+}
+
+pub async fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
+    Ok(fs::read_dir(path)?
+        .filter_map(|entry| {
+            let entry = entry.ok()?;
+            if entry.file_type().ok()?.is_file() {
+                Some(entry.file_name().to_string_lossy().into_owned())
+            } else {
+                None
+            }
+        })
+        .collect())
 }
