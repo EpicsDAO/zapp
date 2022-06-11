@@ -73,7 +73,6 @@ async fn main() {
             }
         }
         Commands::Gh(gh) => {
-            let gcp = get_gcp().await;
             let gh_cmd = gh.command.unwrap_or(GhCommands::Help);
             match gh_cmd {
                 GhCommands::AddEnv => {
