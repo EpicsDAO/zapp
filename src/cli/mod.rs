@@ -27,6 +27,7 @@ pub enum Commands {
     Docker(Docker),
     Sql(Sql),
     G(G),
+    Db(Db),
     New {
         app_name: String
     }
@@ -88,6 +89,13 @@ pub struct G {
     pub command: Option<GCommands>,
 }
 
+#[derive(Debug, Args)]
+#[clap(args_conflicts_with_subcommands = true)]
+pub struct Db {
+    #[clap(subcommand)]
+    pub command: Option<DbCommands>,
+}
+
 #[derive(Debug, Subcommand)]
 pub enum IamCommands {
     Setup,
@@ -145,5 +153,11 @@ pub enum GCommands {
     Model {
         model: String
     },
+    Help
+}
+
+#[derive(Debug, Subcommand)]
+pub enum DbCommands {
+    Migrate,
     Help
 }

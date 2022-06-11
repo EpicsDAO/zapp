@@ -1,7 +1,7 @@
 use clap::Parser;
 use zapp::cli::{
     Cli, Commands, ComputeCommands, DockerCommands, GcpConfig, GhCommands, IamCommands,
-    InitCommands, RunCommands, SqlCommands, GCommands
+    InitCommands, RunCommands, SqlCommands, GCommands, DbCommands
 };
 use zapp::compute::*;
 use zapp::style_print::*;
@@ -12,6 +12,7 @@ use zapp::init::*;
 use zapp::run::*;
 use zapp::sql::*;
 use zapp::g::*;
+use zapp::db::*;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -57,7 +58,7 @@ async fn main() {
                     log_success(log).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu iam --help";
+                    let log = "To see example;\n\n $zapp iam --help";
                     log_error(log).await;
                 }
             }
@@ -72,7 +73,7 @@ async fn main() {
                     process_deploy(&gcp.project_id, &gcp.service_name).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu run --help";
+                    let log = "To see example;\n\n $zapp run --help";
                     log_error(log).await;
                 }
             }
@@ -84,7 +85,7 @@ async fn main() {
                     process_setup_secret().await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu gh --help";
+                    let log = "To see example;\n\n $zapp gh --help";
                     log_error(log).await;
                 }
             }
@@ -99,7 +100,7 @@ async fn main() {
                     build_api_workflow().await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu init --help";
+                    let log = "To see example;\n\n $zapp init --help";
                     log_error(log).await;
                 }
             }
@@ -122,7 +123,7 @@ async fn main() {
                     setup_deployment(gcp).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu compute --help";
+                    let log = "To see example;\n\n $zapp compute --help";
                     log_error(log).await;
                 }
             }
@@ -140,7 +141,7 @@ async fn main() {
                     process_docker_push(&gcp.project_id, &gcp.service_name).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu docker --help";
+                    let log = "To see example;\n\n $zapp docker --help";
                     log_error(log).await;
                 }
             }
@@ -163,7 +164,7 @@ async fn main() {
                     process_assign_network(&gcp.project_id, &gcp.service_name).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu sql --help";
+                    let log = "To see example;\n\n $zapp sql --help";
                     log_error(log).await;
                 }
             }
@@ -173,9 +174,24 @@ async fn main() {
             match g_cmd {
                 GCommands::Model { model } => {
                     process_create_migration(&model).await;
+                    process_create_entity(&model).await;
+                    process_create_mutation(&model).await;
+                    process_create_query(&model).await;
                 }
                 _ => {
-                    let log = "To see example;\n\n $gcu run --help";
+                    let log = "To see example;\n\n $zapp run --help";
+                    log_error(log).await;
+                }
+            }
+        }
+        Commands::Db(db) => {
+            let db_cmd = db.command.unwrap_or(DbCommands::Help);
+            match db_cmd {
+                DbCommands::Migrate => {
+                    process_db_migrate().await;
+                }
+                _ => {
+                    let log = "To see example;\n\n $zapp db --help";
                     log_error(log).await;
                 }
             }

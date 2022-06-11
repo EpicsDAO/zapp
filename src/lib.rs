@@ -8,4 +8,5 @@ pub mod run;
 pub mod docker;
 pub mod sql;
 pub mod g;
+pub mod db;
 pub mod style_print;
