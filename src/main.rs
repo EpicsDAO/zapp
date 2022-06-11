@@ -151,15 +151,10 @@ async fn main() {
                     process_create_sql(&gcp.project_id, &gcp.service_name, &gcp.region).await;
                 }
                 SqlCommands::Patch { action } => {
-                    if &action != "start" || &action != "stop" {
-                        panic!("wrong arg!");
-                    } 
                     process_patch_sql(&gcp.project_id, &gcp.service_name, &action).await;
                 }
                 SqlCommands::Restart => {
-                    let ip = get_instance_ip(&gcp.project_id, &gcp.service_name).await;
-                    println!("{}", ip);
-                    // process_restart_sql(&gcp.project_id, &gcp.service_name).await;
+                    process_restart_sql(&gcp.project_id, &gcp.service_name).await;
                 }
                 SqlCommands::SetPrivateIp => {
                     process_create_ip_range(&gcp.project_id, &gcp.service_name).await;

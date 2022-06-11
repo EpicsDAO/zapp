@@ -8,7 +8,7 @@ pub async fn process_setup_secret() {
   let f = File::open(filename).expect("file not found");
   let reader = BufReader::new(f);
   for line in reader.lines() {
-      let line = line.unwrap(); //unwrapその2
+      let line = line.unwrap();
       let array = line.split('=').fold(Vec::new(), |mut s, i| {
           s.push(i.to_string());
           s

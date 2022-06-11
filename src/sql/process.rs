@@ -4,6 +4,18 @@ use console::style;
 use std::io;
 use regex::Regex;
 use std::str;
+use std::fs;
+use std::io::Write;
+use crate::gh::process_setup_secret;
+
+#[derive(Debug)]
+pub struct EnvProduction {
+  pub database_url: String,
+  pub zapp_gcloudsql_instance: String,
+  pub zapp_gcp_project_id: String,
+  pub zapp_service_name: String,
+  pub zapp_gcp_region: String
+}
 
 fn regex(re_str: &str) -> Regex {
   Regex::new(re_str).unwrap()
@@ -25,6 +37,28 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     style("Creating Cloud SQL ...\nThis process takes 5 to 10 min.").white().bold()
   );
   let instance_name = String::from(service_name) + "-db";
+  let internal_ip = get_instance_ip(project_id, service_name, 1).await;
+  let database_url = String::from("DATABASE_URL='postgres://postgres:") + &db_password + "@" + &internal_ip + ":5432/" + &instance_name + "\n";
+  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=/cloudsql/") + &project_id + ":" + &region + ":" + &instance_name  + "\n";
+  let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id  + "\n";
+  let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name  + "\n";
+  let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region  + "\n";
+
+  let env_production = EnvProduction {
+    database_url,
+    zapp_gcloudsql_instance,
+    zapp_gcp_project_id,
+    zapp_service_name,
+    zapp_gcp_region
+  };
+  let filename = ".env.production";
+  let mut file = fs::File::create(filename).unwrap();
+  file.write_all(env_production.database_url.as_bytes()).unwrap();
+  file.write_all(env_production.zapp_gcloudsql_instance.as_bytes()).unwrap();
+  file.write_all(env_production.zapp_gcp_project_id.as_bytes()).unwrap();
+  file.write_all(env_production.zapp_service_name.as_bytes()).unwrap();
+  file.write_all(env_production.zapp_gcp_region.as_bytes()).unwrap();
+  process_setup_secret().await;
   let db_version = String::from("--database-version=POSTGRES_14");
   let output = Command::new("gcloud")
     .args(&[
@@ -267,7 +301,7 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
 }
 
 
-pub async fn get_instance_ip(project_id: &str, service_name: &str) -> String {
+pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usize) -> String {
   let instance_name = String::from(service_name) + "-db";
   let mut _internal_ip = String::new();
   let output = Command::new("gcloud")
@@ -290,7 +324,11 @@ pub async fn get_instance_ip(project_id: &str, service_name: &str) -> String {
         s.push(i.to_string());
         s
       });
-      ip_array.last().unwrap().clone()
+      if ip_type == 0 {
+        ip_array.first().unwrap().clone()
+      } else {
+        ip_array.last().unwrap().clone()
+      }
     },
     Err(err) => {
       panic!("{:?}", err)
