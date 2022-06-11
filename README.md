@@ -101,12 +101,6 @@ If you have never used Google Cloud before, use this link to create a project.
 
 [How to create a project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 
-:::div{.success}
-Whether you've used Google Cloud before or it's your first time, you can get $200 free credit by using the link below:
-
-[Google Cloud Credit](https://cloud.google.com/partners/partnercredit?pcn_code=0014M00001h3BjPQAU)
-:::
-
 
 ### 4. Setup Cloud Compute Network
 ```bash
