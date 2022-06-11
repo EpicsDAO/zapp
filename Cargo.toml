@@ -5,7 +5,7 @@ version = "0.2.1"
 authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
 edition = "2021"
 license = "Apache-2.0"
-keywords = ["Serverless", "GraphQL API", "Async", "PostgreSQL", "Framework"]
+keywords = ["Serverless", "GraphQL", "Async", "PostgreSQL", "Framework"]
 
 [[bin]]
 name = "zapp"
