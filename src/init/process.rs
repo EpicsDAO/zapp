@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::path::Path;
-use super::actions_yml::ACTIONS_YML;
+use super::actions_yml::*;
 use crate::style_print::*;
 use regex::Regex;
 use std::str;
@@ -84,7 +84,7 @@ async fn build_gcp_config(project_id: String, service_name: String, region: Stri
   }
 }
 
-pub async fn build_api_workflow() {
+pub async fn build_api_workflow(gcr_region: &str) {
   let workflow_dir = ".github/workflows";
   fs::create_dir_all(workflow_dir).unwrap_or_else(|why| {
     println!("! {:?}", why.kind());
@@ -97,7 +97,7 @@ pub async fn build_api_workflow() {
     }
     false => {
       let mut file = fs::File::create(workflow_yml).unwrap();
-      file.write_all(ACTIONS_YML).unwrap();
+      file.write_all(action_yml(gcr_region).await.as_bytes()).unwrap();
       log_success("Successfully created workflow!").await;
     }
   }
@@ -210,7 +210,7 @@ CMD [\"./{}\"]", app_name, app_name, &underscore_app_name, app_name, app_name, a
     false => {
       let mut file = fs::File::create(&filename).unwrap();
       file.write_all(file_content.as_bytes()).unwrap();
-      log_success("Successfully created Dockerfile!").await;
+      log_success("Successfully created Dockerfile!\n").await;
     }
   }
 }

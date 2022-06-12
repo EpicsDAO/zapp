@@ -1,5 +1,5 @@
-pub const ACTIONS_YML: &[u8; 1564] =
-b"name: ZappService
+pub async fn action_yml(gcr_region: &str) -> String {
+  let yml = format!("name: ZappService
 on:
   push:
     branches:
@@ -26,17 +26,17 @@ jobs:
       run: gcloud auth configure-docker --quiet
     
     - name: Build Docker container
-      run: docker build . -t eu.gcr.io/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{secrets.ZAPP_SERVICE_NAME}}
+      run: docker build . -t {}/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{secrets.ZAPP_SERVICE_NAME}}
 
     - name: Push to Container Resistory
-      run: docker push eu.gcr.io/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{secrets.ZAPP_SERVICE_NAME}}
+      run: docker push {}/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{secrets.ZAPP_SERVICE_NAME}}
 
     - name: Deploy to Cloud Run
       run: |
           gcloud beta run deploy zapp-${{ secrets.ZAPP_SERVICE_NAME }} \
             --quiet \
             --service-account=${{ secrets.ZAPP_SERVICE_NAME }}@${{ secrets.ZAPP_GCP_PROJECT_ID }}.iam.gserviceaccount.com \
-            --image=eu.gcr.io/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{ secrets.ZAPP_SERVICE_NAME }} \
+            --image={}/${{ secrets.ZAPP_GCP_PROJECT_ID }}/${{ secrets.ZAPP_SERVICE_NAME }} \
             --memory=8Gi \
             --cpu=2 \
             --vpc-connector='${{ secrets.ZAPP_SERVICE_NAME }}' \
@@ -51,4 +51,6 @@ jobs:
             --port=8080 \
             --set-env-vars='ZAPP_GCP_PROJECT_ID=${{ secrets.ZAPP_GCP_PROJECT_ID }}' \
             --set-env-vars='DATABASE_URL=${{ secrets.DATABASE_URL }}'
-";
+", gcr_region, gcr_region, gcr_region);
+yml
+}

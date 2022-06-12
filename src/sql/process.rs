@@ -336,17 +336,3 @@ pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usiz
   };
   _internal_ip
 }
-
-
-// async fn region_to_timezone(region: &str) -> &str {
-//   let asia = regex("asia");
-//   let eu = regex("europe");
-//   let zone = if asia.is_match(region)  {
-//     "Asia/Tokyo"
-//   } else if eu.is_match(region) {
-//     "Europe/Amsterdam"
-//   } else {
-//     "America/Los_Angeles"
-//   };
-//   zone
-// }

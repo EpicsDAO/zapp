@@ -1,5 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 use serde::{Deserialize, Serialize};
+use regex::Regex;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GcpConfig {
@@ -7,6 +8,25 @@ pub struct GcpConfig {
     pub service_name: String,
     pub region: String,
 }
+
+fn regex(re_str: &str) -> Regex {
+    Regex::new(re_str).unwrap()
+}
+
+impl GcpConfig {
+    pub fn gcr_region(&self) -> &str {
+        let asia = regex("asia");
+        let eu = regex("europe");
+        return if asia.is_match(&self.region)  {
+            "asia.gcr.io"
+        } else if eu.is_match(&self.region) {
+            "eu.gcr.io"
+        } else {
+            "gcr.io"
+        };
+    }
+}
+
 
 #[derive(Parser)]
 #[clap(name = "zapp")]

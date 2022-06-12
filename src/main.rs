@@ -61,10 +61,10 @@ async fn main() {
             let run_cmd = run.command.unwrap_or(RunCommands::Help);
             match run_cmd {
                 RunCommands::Build => {
-                    process_gcloud_build(&gcp.project_id, &gcp.service_name).await;
+                    process_gcloud_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
                 }
                 RunCommands::Deploy => {
-                    process_deploy(&gcp.project_id, &gcp.service_name).await;
+                    process_deploy(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";
@@ -91,7 +91,8 @@ async fn main() {
                     process_init_gcp_config().await;
                 }
                 InitCommands::GhActions => {
-                    build_api_workflow().await;
+                    let gcp = get_gcp().await;
+                    build_api_workflow(gcp.gcr_region()).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp init --help";
@@ -132,11 +133,11 @@ async fn main() {
                 }
                 DockerCommands::Build => {
                     let gcp = get_gcp().await;
-                    process_docker_build(&gcp.project_id, &gcp.service_name).await;
+                    process_docker_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
                 }
                 DockerCommands::Push => {
                     let gcp = get_gcp().await;
-                    process_docker_push(&gcp.project_id, &gcp.service_name).await;
+                    process_docker_push(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp docker --help";
@@ -210,10 +211,10 @@ pub async fn get_gcp() -> GcpConfig {
 
 pub async fn setup_deployment(gcp: GcpConfig) {
     // 1. Create IAM
-    process_create_service_account(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
-    process_create_service_account_key(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
-    process_add_roles(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
-    process_enable_permissions(gcp.project_id.as_str()).await;
+    process_create_service_account(&gcp.project_id, &gcp.service_name).await;
+    process_create_service_account_key(&gcp.project_id, &gcp.service_name).await;
+    process_add_roles(&gcp.project_id, &gcp.service_name).await;
+    process_enable_permissions(&gcp.project_id).await;
     let log = "Your IAM is all set!";
     log_success(log).await;
     // 2. Create NAT
@@ -232,5 +233,5 @@ pub async fn setup_deployment(gcp: GcpConfig) {
     process_connect_vpc_connector(&gcp.project_id, &gcp.service_name).await;
     process_assign_network(&gcp.project_id, &gcp.service_name).await;
     // 5. Create Github Actions Workflow
-    build_api_workflow().await;
+    build_api_workflow(&gcp.gcr_region()).await;
 }

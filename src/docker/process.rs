@@ -2,8 +2,8 @@ use tokio::process::Command;
 use std::str;
 use console::style;
 
-pub async fn process_docker_build(project_id: &str, service_name: &str) {
-  let gcr_url = String::from("eu.gcr.io/") + project_id + "/" + service_name;
+pub async fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
+  let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
   let output = Command::new("docker")
     .args(&["build", ".", "-t", &gcr_url])
     .output()
@@ -11,8 +11,8 @@ pub async fn process_docker_build(project_id: &str, service_name: &str) {
   println!("output = {:?}", output);
 }
 
-pub async fn process_docker_push(project_id: &str, service_name: &str) {
-  let gcr_url = String::from("eu.gcr.io/") + project_id + "/" + service_name;
+pub async fn process_docker_push(project_id: &str, service_name: &str, gcr_region: &str) {
+  let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
   let output = Command::new("docker")
     .args(&["push", &gcr_url])
     .output()

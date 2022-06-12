@@ -1,4 +1,4 @@
-[![ZAPP](https://storage.googleapis.com/zapp-bucket/img/ZAPP-logo.jpeg)]
+![ZAPP](https://storage.googleapis.com/zapp-bucket/img/ZAPP-logo.jpeg)
 <p align="center">
   <a href="https://twitter.com/intent/follow?screen_name=EpicsDAO">
     <img src="https://img.shields.io/twitter/follow/EpicsDAO.svg?label=Follow%20@EpicsDAO" alt="Follow @EpicsDAO" />
@@ -55,28 +55,65 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 ## Installation
 
 ```bash
-cargo install zapp
+$ cargo install zapp
 ```
 
-### Github CLI Auth Login
+## QuickStart
 
+Create your application with zapp command.
 ```bash
-gh auth login
+$ zapp new YOURAPP
 ```
 
-### Gcloud Auth Login
-
+Create Docker PostgreSQL
 ```bash
-gcloud auth login
+$ zapp docker psql
+```
+
+Run GraphQL Local Server
+```bash
+$ cargo run
+```
+
+Now go to
+
+[http://localhost:3000/api/graphql](http://localhost:3000/api/graphql)
+
+
+## GraphQL Mutation/Query Scaffold 
+
+Create Model
+```bash
+$ zapp model user
+```
+
+## DB Migrate
+
+DB Migrate
+```bash
+$ zapp db migrate
 ```
 
 
 ## Deploy to Google Cloud Run
 
+### Github CLI Auth Login
+
+```bash
+$ gh auth login
+```
+
+### Gcloud Auth Login
+
+```bash
+$ gcloud auth login
+```
+
+
 ### 1. Generate Your Application
 ```bash
-zapp new YOURAPP
-cd YOURAPP
+$ zapp new YOURAPP
+$ cd YOURAPP
 ```
 
 ## 2. Create GitHub
@@ -105,15 +142,20 @@ If you have never used Google Cloud before, use this link to create a project.
 
 ### 4. Setup Cloud Compute Network
 ```bash
-zapp compute setup
+$ zapp compute setup
 ```
 
 ### 5. Push it to Github
+
+GitHub Actions start when you make some changes at `main` branch.
+
 ```bash
-git add .
-git commit -m 'first deploy'
-git push origin main
+$ git add .
+$ git commit -m 'first deploy'
+$ git push origin main
 ```
+
+Your APP is all set!
 
 
 ## Contributing
