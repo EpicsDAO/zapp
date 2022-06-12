@@ -31,6 +31,11 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 - Maximize development efficiency with CI / CD standard schema-driven Scaffold
 - Achieve global scale with lower management costs
 
+<p>
+  <a aria-label="Rust Serverless Application Framework">
+    <img src="https://storage.googleapis.com/zapp-bucket/img/zapp-new.gif">
+  </a>
+</p>
 
 ## Dependency
 
