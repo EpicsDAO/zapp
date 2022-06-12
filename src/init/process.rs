@@ -214,3 +214,19 @@ CMD [\"./{}\"]", app_name, app_name, &underscore_app_name, app_name, app_name, a
     }
   }
 }
+
+pub async fn endroll(app_name: &str) {
+  let text1 = "  ███████╗ █████╗ ██████╗ ██████╗ ";
+  let text2 = "  ╚══███╔╝██╔══██╗██╔══██╗██╔══██╗";
+  let text3 = "    ███╔╝ ███████║██████╔╝██████╔╝";
+  let text4 = "   ███╔╝  ██╔══██║██╔═══╝ ██╔═══╝ ";
+  let text5 = "  ███████╗██║  ██║██║     ██║     ";
+  let text6 = "  ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝     ";
+  log_white(text1).await;
+  log_white(text2).await;
+  log_white(text3).await;
+  log_white(text4).await;
+  log_white(text5).await;
+  log_white(text6).await;
+  log_new(&format!("\nEasy to Run\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name)).await;
+}

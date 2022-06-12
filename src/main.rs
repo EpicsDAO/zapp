@@ -26,8 +26,7 @@ async fn main() {
             unzip_zapp(&app_name).await;
             create_dockerfile(&app_name).await;
             git_init(&app_name).await;
-            let msg = format!("Successfully created your zapp!\n\n`cd {}`\n`zapp docker psql`\n`cargo run`", &app_name);
-            log_success(&msg).await;
+            endroll(&app_name).await;
         }
         Commands::Iam(iam) => {
             let gcp = get_gcp().await;

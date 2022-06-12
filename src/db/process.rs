@@ -1,4 +1,11 @@
 use tokio::process::Command;
+use crate::style_print::*;
+use regex::Regex;
+use std::str;
+
+fn regex(re_str: &str) -> Regex {
+    Regex::new(re_str).unwrap()
+}
 
 pub async fn process_db_migrate() {
     let output = Command::new("sea-orm-cli")
@@ -8,5 +15,19 @@ pub async fn process_db_migrate() {
         ])
         .output()
         .await;
-    println!("{:?}", &output.unwrap());
+    match &output {
+        Ok(val) => {
+            let err = str::from_utf8(&val.stdout).unwrap();
+            let rt = regex("Running");
+            match rt.is_match(err) {
+                true => {
+                    log_success("Successfully DB Migrated!").await;
+                }
+                false => {
+                    panic!("{:?}", err)
+                }
+              }
+            }
+        Err(err) => panic!("error = {:?}", err)
+        }
 }

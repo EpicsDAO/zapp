@@ -17,6 +17,22 @@ pub async fn log_error(text: &str) {
   );
 }
 
+pub async fn log_new(text: &str) {
+  println!(
+      "{}{}{}{}{}{}{}{}{}{}{}{}{}",
+      LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,LAUNCH_EMOJI,
+      style(text).white().bold()
+  );
+}
+
+pub async fn log_white(text: &str) {
+  println!(
+      "{}",
+      style(text).blue().bold()
+  );
+}
+
+
 pub async fn log_input(text: &str) {
   println!(
       "{}{}",
