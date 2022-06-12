@@ -33,7 +33,7 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 
 <p>
   <a aria-label="Rust Serverless Application Framework">
-    <img src="https://storage.googleapis.com/zapp-bucket/img/zapp-new.gif">
+    <img src="https://storage.googleapis.com/zapp-bucket/img/zapp-new2.gif">
   </a>
 </p>
 
