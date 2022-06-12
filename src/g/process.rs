@@ -88,8 +88,8 @@ use sea_orm::{{entity::prelude::*, DeleteMany}};
 use serde::{{Deserialize, Serialize}};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
-#[sea_orm(table_name = '{}s')]
-#[graphql(concrete(name = '{}', params()))]
+#[sea_orm(table_name = \"{}s\")]
+#[graphql(concrete(name = \"{}\", params()))]
 pub struct Model {{
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
@@ -120,7 +120,6 @@ impl Entity {{
   file.write_all(file_content.as_bytes()).unwrap();
   log_success(&format!("Successfully created entity file: {}", &file_path)).await;
 }
-
 
 pub async fn process_create_mutation(model: &str) {
   let capital_model = some_kind_of_uppercase_first_letter(model);
@@ -233,7 +232,6 @@ impl {}Query {{
   let mut file = fs::File::create(&file_path).unwrap();
   file.write_all(file_content.as_bytes()).unwrap();
   log_success(&format!("Successfully created query file: {}", &file_path)).await;
-  log_input("Add your route to:\nsrc/graphql/query/mod.rs\nsrc/graphql/mutation/mod.rs").await;
 }
 
 pub async fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
@@ -277,6 +275,17 @@ pub async fn process_create_mutation_route() {
         .open(file_path)
         .unwrap();
     add_line.write_all("\n".as_bytes()).unwrap();
+    for model in &mutation_box {
+        let name = model.split(".")
+            .collect::<Vec<_>>();
+        let content3 = format!("pub use {}::{}Mutation;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .unwrap();
+        add_line.write_all(content3.as_bytes()).unwrap();
+    }
+
     for model in &mutation_box {
         let name = model.split(".")
             .collect::<Vec<_>>();
@@ -342,9 +351,10 @@ pub async fn process_create_query_route() {
         .unwrap();
     add_line.write_all("\n".as_bytes()).unwrap();
     for model in &query_box {
+        let file_path = "entity/src/lib.rs";
         let name = model.split(".")
             .collect::<Vec<_>>();
-        let content3 = format!("pub use {}::{}Query;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let content3 = format!("pub mode {}\n", &name[0]);
         let mut add_line = OpenOptions::new()
             .append(true)
             .open(file_path)
