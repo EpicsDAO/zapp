@@ -3,9 +3,9 @@ use std::fs;
 use std::io::Write;
 use chrono::Local;
 use crate::style_print::*;
-
 use std::io;
 use std::path::Path;
+use std::fs::OpenOptions;
 
 pub async fn process_create_migration(model: &str) {
   let dt = Local::now();
@@ -251,5 +251,127 @@ pub async fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
 
 pub async fn process_create_mutation_route() {
     let dir = "src/graphql/mutation/";
-    println!("{:?}", read_dir(dir).await);
+    let files = read_dir(dir).await.unwrap();
+    let mutation_box = files.iter().cloned()
+        .filter(|i| i != "mod.rs")
+        .map(|i| {i.replace(".rs", "")})
+        .collect::<Vec<_>>();
+
+    let file_path = "src/graphql/mutation/mod.rs";
+    let content1 = b"use entity::async_graphql;\n\n";
+    let mut file = fs::File::create(&file_path).unwrap();
+    file.write_all(content1).unwrap();
+
+    for model in &mutation_box {
+        let name = model.split(".")
+            .collect::<Vec<_>>();
+        let content2 = format!("pub mod {};\n", &name[0]);
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .unwrap();
+        add_line.write_all(content2.as_bytes()).unwrap();
+    }
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all("\n".as_bytes()).unwrap();
+    for model in &mutation_box {
+        let name = model.split(".")
+            .collect::<Vec<_>>();
+        let content3 = format!("pub use {}::{}Mutation;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .unwrap();
+        add_line.write_all(content3.as_bytes()).unwrap();
+    }
+    
+    let content4 = b"\n#[derive(async_graphql::MergedObject, Default)]";
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all(content4).unwrap();
+    let capital_box = mutation_box.iter().cloned()
+        .map(|i|{
+            some_kind_of_uppercase_first_letter(&i)
+        })
+        .collect::<Vec<_>>();
+    let last_line = capital_box.iter().cloned()
+        .map(|i| { i + "Mutation" })
+        .collect::<Vec<_>>();
+
+    let content5 = format!("\npub struct Mutation({});", &last_line.join(", "));
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all(&content5.as_bytes()).unwrap();
+    log_success(&format!("Successfully added mutation route: {}", &file_path)).await;
+}
+
+
+pub async fn process_create_query_route() {
+    let dir = "src/graphql/query/";
+    let files = read_dir(dir).await.unwrap();
+    let query_box = files.iter().cloned()
+        .filter(|i| i != "mod.rs")
+        .map(|i| {i.replace(".rs", "")})
+        .collect::<Vec<_>>();
+
+    let file_path = "src/graphql/query/mod.rs";
+    let content1 = b"use entity::async_graphql;\n\n";
+    let mut file = fs::File::create(&file_path).unwrap();
+    file.write_all(content1).unwrap();
+
+    for model in &query_box {
+        let name = model.split(".")
+            .collect::<Vec<_>>();
+        let content2 = format!("pub mod {};\n", &name[0]);
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .unwrap();
+        add_line.write_all(content2.as_bytes()).unwrap();
+    }
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all("\n".as_bytes()).unwrap();
+    for model in &query_box {
+        let name = model.split(".")
+            .collect::<Vec<_>>();
+        let content3 = format!("pub use {}::{}Query;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path)
+            .unwrap();
+        add_line.write_all(content3.as_bytes()).unwrap();
+    }
+    
+    let content4 = b"\n#[derive(async_graphql::MergedObject, Default)]";
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all(content4).unwrap();
+    let capital_box = query_box.iter().cloned()
+        .map(|i|{
+            some_kind_of_uppercase_first_letter(&i)
+        })
+        .collect::<Vec<_>>();
+    let last_line = capital_box.iter().cloned()
+        .map(|i| { i + "Query" })
+        .collect::<Vec<_>>();
+
+    let content5 = format!("\npub struct Query({});", &last_line.join(", "));
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path)
+        .unwrap();
+    add_line.write_all(&content5.as_bytes()).unwrap();
+    log_success(&format!("Successfully added mutation route: {}", &file_path)).await;
 }

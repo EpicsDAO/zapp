@@ -177,6 +177,8 @@ async fn main() {
                     process_create_entity(&model).await;
                     process_create_mutation(&model).await;
                     process_create_query(&model).await;
+                    process_create_mutation_route().await;
+                    process_create_query_route().await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";
