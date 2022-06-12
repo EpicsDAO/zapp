@@ -116,7 +116,7 @@ $ zapp new YOURAPP
 $ cd YOURAPP
 ```
 
-## 2. Create GitHub
+### 2. Create GitHub
 
 Let's create a new repository on GitHub.
 
