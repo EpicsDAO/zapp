@@ -210,7 +210,6 @@ CMD [\"./{}\"]", app_name, app_name, &underscore_app_name, app_name, app_name, a
     false => {
       let mut file = fs::File::create(&filename).unwrap();
       file.write_all(file_content.as_bytes()).unwrap();
-      log_success("Successfully created Dockerfile!\n").await;
     }
   }
 }
@@ -228,5 +227,5 @@ pub async fn endroll(app_name: &str) {
   log_white(text4).await;
   log_white(text5).await;
   log_white(text6).await;
-  log_new(&format!("\nEasy to Run\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name)).await;
+  log_new(&format!("\nRust Serverless Framework\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name)).await;
 }

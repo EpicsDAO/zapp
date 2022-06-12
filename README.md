@@ -58,16 +58,57 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 $ cargo install zapp
 ```
 
+```bash
+zapp --help
+EpicsDAO
+Rust Serverless Framework
+
+USAGE:
+    zapp <SUBCOMMAND>
+
+OPTIONS:
+    -h, --help       Print help information
+    -V, --version    Print version information
+
+SUBCOMMANDS:
+    compute    
+    db         
+    docker     
+    g          
+    gh         
+    help       Print this message or the help of the given subcommand(s)
+    iam        
+    init       
+    new        
+    run        
+    sql        
+```
+
 ## QuickStart
 
-Create your application with zapp command.
+Create your application with zapp CLI.
 ```bash
 $ zapp new YOURAPP
+
+  ███████╗ █████╗ ██████╗ ██████╗ 
+  ╚══███╔╝██╔══██╗██╔══██╗██╔══██╗
+    ███╔╝ ███████║██████╔╝██████╔╝
+   ███╔╝  ██╔══██║██╔═══╝ ██╔═══╝ 
+  ███████╗██║  ██║██║     ██║     
+  ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝     
+💃 💃 💃 💃 💃 💃 💃 💃 💃 💃 💃 💃 
+Rust Serverless Framework
+$ cd YOURAPP
+$ zapp docker psql
+$ cargo run
+
+Go to : http://localhost:3000/api/graphql
 ```
 
 Create Docker PostgreSQL
 ```bash
 $ zapp docker psql
+✅ PostgreSQL Container Created: 4619cfc047f3cad6c9db8d255aff841fbfe34bbef0e2661fa3a02db5d5ec5d91
 ```
 
 Run GraphQL Local Server
@@ -84,7 +125,13 @@ Now go to
 
 Create Model
 ```bash
-$ zapp model user
+$ zapp g model user
+✅ Successfully created migration file: migration/src/m20220612_211439_create_user_table.rs
+✅ Successfully created entity file: entity/src/user.rs
+✅ Successfully created mutation file: src/graphql/mutation/user.rs
+✅ Successfully created query file: src/graphql/query/user.rs
+✅ Successfully added mutation route: src/graphql/mutation/mod.rs
+✅ Successfully added mutation route: src/graphql/query/mod.rs
 ```
 
 ## DB Migrate
@@ -92,6 +139,7 @@ $ zapp model user
 DB Migrate
 ```bash
 $ zapp db migrate
+✅ Successfully DB migrated
 ```
 
 
