@@ -1,21 +1,20 @@
 use clap::Parser;
+use std::fs::File;
+use std::io::BufReader;
 use zapp::cli::{
-    Cli, Commands, ComputeCommands, DockerCommands, GcpConfig, GhCommands, IamCommands,
-    InitCommands, RunCommands, SqlCommands, GCommands, DbCommands
+    Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcpConfig, GhCommands,
+    IamCommands, InitCommands, RunCommands, SqlCommands,
 };
 use zapp::compute::*;
-use zapp::style_print::*;
+use zapp::db::*;
 use zapp::docker::*;
+use zapp::g::*;
 use zapp::gh::*;
 use zapp::iam::*;
 use zapp::init::*;
 use zapp::run::*;
 use zapp::sql::*;
-use zapp::g::*;
-use zapp::db::*;
-use std::fs::File;
-use std::io::BufReader;
-
+use zapp::style_print::*;
 
 #[tokio::main]
 async fn main() {
@@ -23,9 +22,8 @@ async fn main() {
     match cli.command {
         Commands::New { app_name } => {
             dl_zapp(&app_name).await;
-            unzip_zapp(&app_name).await;
             create_dockerfile(&app_name).await;
-            git_init(&app_name).await;
+            //git_init(&app_name).await;
             endroll(&app_name).await;
         }
         Commands::Iam(iam) => {
@@ -61,7 +59,8 @@ async fn main() {
             let run_cmd = run.command.unwrap_or(RunCommands::Help);
             match run_cmd {
                 RunCommands::Build => {
-                    process_gcloud_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
+                    process_gcloud_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region())
+                        .await;
                 }
                 RunCommands::Deploy => {
                     process_deploy(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
@@ -133,11 +132,13 @@ async fn main() {
                 }
                 DockerCommands::Build => {
                     let gcp = get_gcp().await;
-                    process_docker_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
+                    process_docker_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region())
+                        .await;
                 }
                 DockerCommands::Push => {
                     let gcp = get_gcp().await;
-                    process_docker_push(&gcp.project_id, &gcp.service_name, &gcp.gcr_region()).await;
+                    process_docker_push(&gcp.project_id, &gcp.service_name, &gcp.gcr_region())
+                        .await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp docker --help";

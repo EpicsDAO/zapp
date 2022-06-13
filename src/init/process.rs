@@ -1,14 +1,14 @@
-use tokio::process::Command;
+use super::actions_yml::*;
+use crate::style_print::*;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::path::Path;
-use super::actions_yml::*;
-use crate::style_print::*;
-use regex::Regex;
 use std::str;
+use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
   Regex::new(re_str).unwrap()
@@ -97,7 +97,9 @@ pub async fn build_api_workflow(gcr_region: &str) {
     }
     false => {
       let mut file = fs::File::create(workflow_yml).unwrap();
-      file.write_all(action_yml(gcr_region).await.as_bytes()).unwrap();
+      file
+        .write_all(action_yml(gcr_region).await.as_bytes())
+        .unwrap();
       log_success("Successfully created workflow!").await;
     }
   }
@@ -105,12 +107,12 @@ pub async fn build_api_workflow(gcr_region: &str) {
 
 pub async fn dl_zapp(app_name: &str) {
   let version_range = "v0.2";
-  let zapp_dl_url = format!("https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz", version_range);
+  let zapp_dl_url = format!(
+    "https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz",
+    version_range
+  );
   let output = Command::new("curl")
-    .args(&[
-      "-OL",
-      &zapp_dl_url
-    ])
+    .args(&["-OL", &zapp_dl_url])
     .output()
     .await;
   match &output {
@@ -126,19 +128,15 @@ pub async fn dl_zapp(app_name: &str) {
           panic!("{:?}", err.unwrap())
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
-
 
 pub async fn unzip_zapp(app_name: &str) {
   let filename = "zapp-api.tar.gz";
   let output = Command::new("tar")
-    .args(&[
-      "-zxvf",
-      &filename,
-    ])
+    .args(&["-zxvf", &filename])
     .output()
     .await;
   match &output {
@@ -151,30 +149,24 @@ pub async fn unzip_zapp(app_name: &str) {
         }
         false => {
           let _ = fs::rename("zapp-api", app_name);
-          let _ = fs::remove_file(filename);
+          let _ = fs::remove_file(&filename);
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
 pub async fn git_init(app_name: &str) {
   let output = Command::new("cd")
-    .args(&[
-      &app_name,
-      "&&",
-      "git",
-      "init",
-      "--initial-branch=main"
-    ])
+    .args(&[&app_name, "&&", "git", "init", "--initial-branch=main"])
     .output()
     .await;
   match &output {
     Ok(_val) => {
-        // println!("{:?}", val);
-      }
-    Err(err) => println!("error = {:?}", err)
+      // println!("{:?}", val);
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -185,7 +177,8 @@ pub async fn underscore(s: &str) -> String {
 pub async fn create_dockerfile(app_name: &str) {
   let filename = format!("{}/Dockerfile", app_name);
   let underscore_app_name = underscore(app_name).await;
-  let file_content = format!("FROM rust:1.61 as build
+  let file_content = format!(
+    "FROM rust:1.61 as build
 RUN USER=root cargo new --bin {}
 WORKDIR /{}
 COPY entity entity
@@ -201,7 +194,9 @@ RUN cargo build --release
 FROM debian:11.3
 COPY --from=build /{}/target/release/{} .
 
-CMD [\"./{}\"]", app_name, app_name, &underscore_app_name, app_name, app_name, app_name);
+CMD [\"./{}\"]",
+    app_name, app_name, &underscore_app_name, app_name, app_name, app_name
+  );
   let file_exist = Path::new(&filename).exists();
   match file_exist {
     true => {
