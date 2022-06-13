@@ -1,7 +1,7 @@
-use tokio::process::Command;
 use crate::style_print::*;
 use regex::Regex;
 use std::str;
+use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
   Regex::new(re_str).unwrap()
@@ -9,48 +9,13 @@ fn regex(re_str: &str) -> Regex {
 
 pub async fn process_create_network(project_id: &str, service_name: &str) {
   let output = Command::new("gcloud")
-    .args(
-      &[
-        "compute",
-        "networks",
-        "create",
-        service_name,
-        "--project",
-        project_id
-        ])
-    .output()
-    .await;
-  match &output {
-    Ok(val) => {
-      let err = str::from_utf8(&val.stderr);
-      let rt = regex("ERROR:");
-      match rt.is_match(err.unwrap()) {
-        true => {
-            panic!("{:?}", err.unwrap())
-        }
-        false => {
-          log_success("Successfully created Network!").await;
-        }
-      }
-    },
-    Err(err) => println!("error = {:?}", err)
-  }
-}
-
-pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
-  let output = Command::new("gcloud")
     .args(&[
       "compute",
-      "firewall-rules",
+      "networks",
       "create",
-      "--network",
       service_name,
-      "--allow",
-      "tcp,udp,icmp",
-      "--source-ranges",
-      "10.124.0.0/28",
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -60,14 +25,50 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Network!").await;
+        }
+      }
+    }
+    Err(err) => println!("error = {:?}", err),
+  }
+}
+
+pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
+  let firewall = String::from(service_name) + "-tcp";
+  let output = Command::new("gcloud")
+    .args(&[
+      "compute",
+      "firewall-rules",
+      "create",
+      &firewall,
+      "--network",
+      service_name,
+      "--allow",
+      "tcp,udp,icmp",
+      "--source-ranges",
+      "10.124.0.0/28",
+      "--project",
+      project_id,
+    ])
+    .output()
+    .await;
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created Firewall!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -84,7 +85,7 @@ pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
       "--allow",
       "tcp:22,tcp:3389,icmp",
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -107,7 +108,7 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
       "--region",
       region,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -117,14 +118,14 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created Subnet!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -145,7 +146,7 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
       "--region",
       region,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -155,14 +156,14 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created VPC Connector!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -179,7 +180,7 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
       "--region",
       region,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -189,31 +190,30 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created Router!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
 pub async fn process_create_external_ip(project_id: &str, service_name: &str, region: &str) {
   let external_ip = String::from(service_name) + "-ip";
   let output = Command::new("gcloud")
-    .args(
-      &[
-        "compute",
-        "addresses",
-        "create",
-        &external_ip,
-        "--region",
-        region,
-        "--project",
-        project_id
-        ])
+    .args(&[
+      "compute",
+      "addresses",
+      "create",
+      &external_ip,
+      "--region",
+      region,
+      "--project",
+      project_id,
+    ])
     .output()
     .await;
   match &output {
@@ -222,14 +222,14 @@ pub async fn process_create_external_ip(project_id: &str, service_name: &str, re
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created External IP!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -254,7 +254,7 @@ pub async fn process_create_nat(project_id: &str, service_name: &str, region: &s
       "--nat-external-ip-pool",
       &nat_external_ip_pool,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -264,13 +264,13 @@ pub async fn process_create_nat(project_id: &str, service_name: &str, region: &s
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           log_success("Successfully created Cloud NAT!").await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
