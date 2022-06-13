@@ -37,6 +37,7 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
   </a>
 </p>
 
+
 ## Dependency
 
 - [Google SDK](https://cloud.google.com/sdk/docs)
@@ -124,6 +125,13 @@ $ cargo run
 Now go to
 
 [http://localhost:3000/api/graphql](http://localhost:3000/api/graphql)
+
+
+<p>
+  <a aria-label="Async GraphQL">
+    <img src="https://storage.googleapis.com/zapp-bucket/img/graphql.gif">
+  </a>
+</p>
 
 
 ## GraphQL Mutation/Query Scaffold 

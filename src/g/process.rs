@@ -36,7 +36,7 @@ fn get_seaorm_drop_stmt<E: EntityTrait>(e: E) -> TableDropStatement {{
 
 impl MigrationName for Migration {{
     fn name(&self) -> &str {{
-        'm{}{}{}_{}{}{}_create_{}_table'
+        \"m{}{}{}_{}{}{}_create_{}_table\"
     }}
 }}
 
