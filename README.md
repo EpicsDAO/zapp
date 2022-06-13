@@ -147,6 +147,8 @@ $ zapp g model user
 
 `entity/src/user.rs`
 ```rust
+・
+・
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
 #[sea_orm(table_name = "users")]
 #[graphql(concrete(name = "User", params()))]
@@ -157,20 +159,28 @@ pub struct Model {
     pub username: String,
     pub email: String
 }
+・
+・
 ```
 
-### Define Mutation Input
+### 2. Define Mutation Input
 `graphql/src/mutation/user.rs`
 ```rust
+・
+・
 #[derive(InputObject)]
 pub struct CreateUserInput {
     pub username: String,
     pub email: String
 }
+・
+・
 ```
 
-### 2. Define Mutation method
+### 3. Define Mutation method
 ```rust
+・
+・
 #[Object]
 impl UserMutation {
     pub async fn create_user(
@@ -190,11 +200,10 @@ impl UserMutation {
     }
     ・
     ・
-    ・
 ```
 
 
-### 3. DB Migrate
+### 4. DB Migrate
 
 DB Migrate
 ```bash
