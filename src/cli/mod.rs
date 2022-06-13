@@ -1,6 +1,6 @@
 use clap::{Args, Parser, Subcommand};
-use serde::{Deserialize, Serialize};
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GcpConfig {
@@ -17,7 +17,7 @@ impl GcpConfig {
     pub fn gcr_region(&self) -> &str {
         let asia = regex("asia");
         let eu = regex("europe");
-        return if asia.is_match(&self.region)  {
+        return if asia.is_match(&self.region) {
             "asia.gcr.io"
         } else if eu.is_match(&self.region) {
             "eu.gcr.io"
@@ -26,7 +26,6 @@ impl GcpConfig {
         };
     }
 }
-
 
 #[derive(Parser)]
 #[clap(name = "zapp")]
@@ -48,9 +47,8 @@ pub enum Commands {
     Sql(Sql),
     G(G),
     Db(Db),
-    New {
-        app_name: String
-    }
+    New { app_name: String },
+    Gcloud(Gcloud),
 }
 
 #[derive(Debug, Args)]
@@ -116,6 +114,13 @@ pub struct Db {
     pub command: Option<DbCommands>,
 }
 
+#[derive(Debug, Args)]
+#[clap(args_conflicts_with_subcommands = true)]
+pub struct Gcloud {
+    #[clap(subcommand)]
+    pub command: Option<GcloudCommands>,
+}
+
 #[derive(Debug, Subcommand)]
 pub enum IamCommands {
     Setup,
@@ -125,7 +130,6 @@ pub enum IamCommands {
 #[derive(Debug, Subcommand)]
 pub enum ComputeCommands {
     CreateNat,
-    Setup,
     Help,
 }
 
@@ -160,20 +164,16 @@ pub enum DockerCommands {
 #[derive(Debug, Subcommand)]
 pub enum SqlCommands {
     Create,
-    Patch {
-        action: String
-    },
+    Patch { action: String },
     Restart,
     SetPrivateIp,
-    Help
+    Help,
 }
 
 #[derive(Debug, Subcommand)]
 pub enum GCommands {
-    Model {
-        model: String
-    },
-    Help
+    Model { model: String },
+    Help,
 }
 
 #[derive(Debug, Subcommand)]
@@ -182,5 +182,11 @@ pub enum DbCommands {
     Reset,
     Refresh,
     Rollback,
-    Help
+    Help,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum GcloudCommands {
+    Setup,
+    Help,
 }

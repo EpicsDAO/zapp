@@ -64,7 +64,7 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
           panic!("{:?}", err.unwrap())
         }
         false => {
-          log_success("Successfully created Firewall!").await;
+          log_success("Successfully created Firewall TCP Rule!").await;
         }
       }
     }
@@ -89,7 +89,21 @@ pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
     ])
     .output()
     .await;
-  println!("output = {:?}", output);
+  match &output {
+    Ok(val) => {
+      let err = str::from_utf8(&val.stderr);
+      let rt = regex("ERROR:");
+      match rt.is_match(err.unwrap()) {
+        true => {
+          panic!("{:?}", err.unwrap())
+        }
+        false => {
+          log_success("Successfully created Firewall SSH Rule!").await;
+        }
+      }
+    }
+    Err(err) => println!("error = {:?}", err),
+  }
 }
 
 pub async fn process_create_subnet(project_id: &str, service_name: &str, region: &str) {

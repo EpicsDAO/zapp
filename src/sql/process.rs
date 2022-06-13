@@ -1,12 +1,12 @@
-use tokio::process::Command;
+use crate::gh::process_setup_secret;
 use crate::style_print::*;
 use console::style;
-use std::io;
 use regex::Regex;
-use std::str;
 use std::fs;
+use std::io;
 use std::io::Write;
-use crate::gh::process_setup_secret;
+use std::str;
+use tokio::process::Command;
 
 #[derive(Debug)]
 pub struct EnvProduction {
@@ -14,7 +14,7 @@ pub struct EnvProduction {
   pub zapp_gcloudsql_instance: String,
   pub zapp_gcp_project_id: String,
   pub zapp_service_name: String,
-  pub zapp_gcp_region: String
+  pub zapp_gcp_region: String,
 }
 
 fn regex(re_str: &str) -> Regex {
@@ -34,31 +34,11 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
   let zone = String::from(region) + "-b";
   println!(
     "⏰ {}",
-    style("Creating Cloud SQL ...\nThis process takes 5 to 10 min.").white().bold()
+    style("Creating Cloud SQL ...\nThis process takes 5 to 10 min.")
+      .white()
+      .bold()
   );
   let instance_name = String::from(service_name) + "-db";
-  let internal_ip = get_instance_ip(project_id, service_name, 1).await;
-  let database_url = String::from("DATABASE_URL='postgres://postgres:") + &db_password + "@" + &internal_ip + ":5432/" + &instance_name + "\n";
-  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=/cloudsql/") + &project_id + ":" + &region + ":" + &instance_name  + "\n";
-  let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id  + "\n";
-  let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name  + "\n";
-  let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region  + "\n";
-
-  let env_production = EnvProduction {
-    database_url,
-    zapp_gcloudsql_instance,
-    zapp_gcp_project_id,
-    zapp_service_name,
-    zapp_gcp_region
-  };
-  let filename = ".env.production";
-  let mut file = fs::File::create(filename).unwrap();
-  file.write_all(env_production.database_url.as_bytes()).unwrap();
-  file.write_all(env_production.zapp_gcloudsql_instance.as_bytes()).unwrap();
-  file.write_all(env_production.zapp_gcp_project_id.as_bytes()).unwrap();
-  file.write_all(env_production.zapp_service_name.as_bytes()).unwrap();
-  file.write_all(env_production.zapp_gcp_region.as_bytes()).unwrap();
-  process_setup_secret().await;
   let db_version = String::from("--database-version=POSTGRES_14");
   let output = Command::new("gcloud")
     .args(&[
@@ -76,7 +56,7 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
       "--database-flags",
       "cloudsql.iam_authentication=on",
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -86,29 +66,69 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           println!(
-              "✅ {}",
-              style("Successfully created Cloud SQL!").white().bold()
+            "✅ {}",
+            style("Successfully created Cloud SQL!").white().bold()
           );
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
+  let internal_ip = get_instance_ip(project_id, service_name, 1).await;
+  let database_url = String::from("DATABASE_URL='postgres://postgres:")
+    + &db_password
+    + "@"
+    + &internal_ip
+    + ":5432/"
+    + &instance_name
+    + "\n";
+  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=/cloudsql/")
+    + &project_id
+    + ":"
+    + &region
+    + ":"
+    + &instance_name
+    + "\n";
+  let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id + "\n";
+  let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name + "\n";
+  let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region + "\n";
+
+  let env_production = EnvProduction {
+    database_url,
+    zapp_gcloudsql_instance,
+    zapp_gcp_project_id,
+    zapp_service_name,
+    zapp_gcp_region,
+  };
+  let filename = ".env.production";
+  let mut file = fs::File::create(filename).unwrap();
+  file
+    .write_all(env_production.database_url.as_bytes())
+    .unwrap();
+  file
+    .write_all(env_production.zapp_gcloudsql_instance.as_bytes())
+    .unwrap();
+  file
+    .write_all(env_production.zapp_gcp_project_id.as_bytes())
+    .unwrap();
+  file
+    .write_all(env_production.zapp_service_name.as_bytes())
+    .unwrap();
+  file
+    .write_all(env_production.zapp_gcp_region.as_bytes())
+    .unwrap();
+  process_setup_secret().await;
 }
 
 pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &str) {
   let instance_name = String::from(service_name) + "-db";
   let activation_policy = match action {
-    "start" => {
-      "ALWAYS"
-    }
-    "stop" => {
-      "NEVER"
-    }
+    "start" => "ALWAYS",
+    "stop" => "NEVER",
     _ => {
       panic!("No action name!");
     }
@@ -122,7 +142,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       "--activation-policy",
       activation_policy,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -132,17 +152,17 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           println!(
-              "✅ {}",
-              style("Successfully patched Cloud SQL!").white().bold()
+            "✅ {}",
+            style("Successfully patched Cloud SQL!").white().bold()
           );
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
@@ -155,7 +175,7 @@ pub async fn process_restart_sql(project_id: &str, service_name: &str) {
       "restart",
       &instance_name,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -165,22 +185,16 @@ pub async fn process_restart_sql(project_id: &str, service_name: &str) {
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully restart Cloud SQL!").await
-        }
+        false => log_success("Successfully restart Cloud SQL!").await,
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
 pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
-  println!(
-    "⏰ {}",
-    style("Creating IP range ...\nThis process takes 5 to 10 min.").white().bold()
-  );
   let ip_range_name = String::from(service_name) + "-ip-range";
   let network = String::from("--network=") + service_name;
   let output = Command::new("gcloud")
@@ -195,7 +209,7 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
       "--description='peering range for Epics'",
       &network,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -205,24 +219,26 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           println!(
-              "✅ {}",
-              style("Successfully created IP range!").white().bold()
+            "✅ {}",
+            style("Successfully created IP range!").white().bold()
           );
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
 pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str) {
   println!(
     "⏰ {}",
-    style("Connecting to VPC Connector ...\nThis process takes 5 to 10 min.").white().bold()
+    style("Connecting to VPC Connector ...\nThis process takes 5 to 10 min.")
+      .white()
+      .bold()
   );
   let ip_range_name = String::from(service_name) + "-ip-range";
   let network = String::from("--network=") + service_name;
@@ -236,7 +252,7 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
       &ip_range_name,
       &network,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -246,24 +262,26 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           println!(
-              "✅ {}",
-              style("Successfully connected to VPC!").white().bold()
+            "✅ {}",
+            style("Successfully connected to VPC!").white().bold()
           );
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
 
 pub async fn process_assign_network(project_id: &str, service_name: &str) {
   println!(
     "⏰ {}",
-    style("Assign network ...\nThis process takes 5 to 10 min.").white().bold()
+    style("Assign network ...\nThis process takes 5 to 10 min.")
+      .white()
+      .bold()
   );
   let instance_name = String::from(service_name) + "-db";
   let network = String::from("--network=") + service_name;
@@ -276,7 +294,7 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
       &instance_name,
       &network,
       "--project",
-      project_id
+      project_id,
     ])
     .output()
     .await;
@@ -286,20 +304,19 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-            panic!("{:?}", err.unwrap())
+          panic!("{:?}", err.unwrap())
         }
         false => {
           println!(
-              "✅ {}",
-              style("Successfully setup your database!").white().bold()
+            "✅ {}",
+            style("Successfully Assigned Network!").white().bold()
           );
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
-
 
 pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usize) -> String {
   let instance_name = String::from(service_name) + "-db";
@@ -313,7 +330,7 @@ pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usiz
       "--project",
       project_id,
       "--format",
-      "value(ipAddresses.ipAddress)"
+      "value(ipAddresses.ipAddress)",
     ])
     .output()
     .await;
@@ -329,7 +346,7 @@ pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usiz
       } else {
         ip_array.last().unwrap().clone()
       }
-    },
+    }
     Err(err) => {
       panic!("{:?}", err)
     }

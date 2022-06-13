@@ -2,8 +2,8 @@ use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
 use zapp::cli::{
-    Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcpConfig, GhCommands,
-    IamCommands, InitCommands, RunCommands, SqlCommands,
+    Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcloudCommands,
+    GcpConfig, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
 };
 use zapp::compute::*;
 use zapp::db::*;
@@ -23,8 +23,20 @@ async fn main() {
         Commands::New { app_name } => {
             dl_zapp(&app_name).await;
             create_dockerfile(&app_name).await;
-            //git_init(&app_name).await;
             endroll(&app_name).await;
+        }
+        Commands::Gcloud(gcloud) => {
+            let gcp = get_gcp().await;
+            let gcloud_cmd = gcloud.command.unwrap_or(GcloudCommands::Help);
+            match gcloud_cmd {
+                GcloudCommands::Setup => {
+                    setup_deployment(gcp).await;
+                }
+                _ => {
+                    let log = "To see example;\n\n $zapp gcloud --help";
+                    log_error(log).await;
+                }
+            }
         }
         Commands::Iam(iam) => {
             let gcp = get_gcp().await;
@@ -113,9 +125,6 @@ async fn main() {
                     process_create_external_ip(&gcp.project_id, &gcp.service_name, &gcp.region)
                         .await;
                     process_create_nat(&gcp.project_id, &gcp.service_name, &gcp.region).await;
-                }
-                ComputeCommands::Setup => {
-                    setup_deployment(gcp).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp compute --help";

@@ -1,12 +1,13 @@
 pub mod cli;
 pub mod compute;
 pub mod constants;
+pub mod db;
+pub mod docker;
+pub mod g;
+pub mod gcloud;
 pub mod gh;
 pub mod iam;
 pub mod init;
 pub mod run;
-pub mod docker;
 pub mod sql;
-pub mod g;
-pub mod db;
 pub mod style_print;
