@@ -90,8 +90,6 @@ pub async fn edit_migration_lib() {
     let mut file = fs::File::create(&file_path).unwrap();
     file.write_all(content1).unwrap();
 
-    println!("{:?}", files_box);
-
     for model in &files_box {
         let content2 = format!("mod {};\n", model);
         let mut add_line = OpenOptions::new()
