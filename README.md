@@ -132,8 +132,10 @@ Create Model
 ```bash
 $ zapp g model user
 ✅ Successfully created migration file: migration/src/m20220612_211439_create_user_table.rs
+✅ Successfully added route to: migration/src/lib.rs
 ✅ Successfully created entity file: entity/src/user.rs
 ✅ Successfully created mutation file: src/graphql/mutation/user.rs
+✅ Successfully added route to: entity/src/lib.rs
 ✅ Successfully created query file: src/graphql/query/user.rs
 ✅ Successfully added mutation route: src/graphql/mutation/mod.rs
 ✅ Successfully added mutation route: src/graphql/query/mod.rs

@@ -65,6 +65,8 @@ impl MigrationTrait for Migration {{
   let mut file = fs::File::create(&file_path).unwrap();
   file.write_all(file_content.as_bytes()).unwrap();
   log_success(&format!("Successfully created migration file: {}", &file_path)).await;
+  // Edit migration/src/lib.rs
+  edit_migration_lib().await;
 }
 
 fn some_kind_of_uppercase_first_letter(s: &str) -> String {
@@ -73,6 +75,62 @@ fn some_kind_of_uppercase_first_letter(s: &str) -> String {
       None => String::new(),
       Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
   }
+}
+
+pub async fn edit_migration_lib() {
+    let content1 = b"pub use sea_orm_migration::prelude::*;\n\npub struct Migrator;\n\n";
+    let dir = "migration/src/";
+    let file_path = String::from(dir) + "lib.rs";
+    let files = read_dir(dir).await.unwrap();
+    let files_box = files.iter().cloned()
+        .filter(|i| i != "lib.rs")
+        .filter(|i| i != "main.rs")
+        .map(|i| {i.replace(".rs", "")})
+        .collect::<Vec<_>>();
+    let mut file = fs::File::create(&file_path).unwrap();
+    file.write_all(content1).unwrap();
+
+    println!("{:?}", files_box);
+
+    for model in &files_box {
+        let content2 = format!("mod {};\n", model);
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(&file_path)
+            .unwrap();
+        add_line.write_all(content2.as_bytes()).unwrap();
+    }
+
+    let content3 = b"\n#[async_trait::async_trait]
+impl MigratorTrait for Migrator {
+    fn migrations() -> Vec<Box<dyn MigrationTrait>> {
+        vec![\n             ";
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(&file_path)
+        .unwrap();
+    add_line.write_all(content3).unwrap();
+
+    let migration_box = files_box.iter().cloned()
+        .map(|i| { String::from("Box::new(") + &i + "::Migration)" })
+        .collect::<Vec<_>>();
+
+    let content4 = format!("{}", &migration_box.join(", "));
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(&file_path)
+        .unwrap();
+    add_line.write_all(&content4.as_bytes()).unwrap();
+
+    let content5 = b"\n               ]
+        }
+}";
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(&file_path)
+        .unwrap();
+        add_line.write_all(content5).unwrap();
+    log_success("Successfully added route to `migration/src/lib.rs`").await;
 }
 
 pub async fn process_create_entity(model: &str) {
@@ -280,6 +338,7 @@ pub async fn process_create_mutation_route() {
             .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
+    log_success("Successfully added route to `entity/src/lib.rs`").await;
     let mut add_line = OpenOptions::new()
         .append(true)
         .open(file_path)

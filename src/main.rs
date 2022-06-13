@@ -192,6 +192,15 @@ async fn main() {
                 DbCommands::Migrate => {
                     process_db_migrate().await;
                 }
+                DbCommands::Reset => {
+                    process_db_reset().await;
+                }
+                DbCommands::Refresh => {
+                    process_db_refresh().await;
+                }
+                DbCommands::Rollback => {
+                    process_db_rollback().await;
+                }
                 _ => {
                     let log = "To see example;\n\n $zapp db --help";
                     log_error(log).await;

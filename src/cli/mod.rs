@@ -179,5 +179,8 @@ pub enum GCommands {
 #[derive(Debug, Subcommand)]
 pub enum DbCommands {
     Migrate,
+    Reset,
+    Refresh,
+    Rollback,
     Help
 }
