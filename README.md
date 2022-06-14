@@ -37,7 +37,6 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
   </a>
 </p>
 
-
 ## Dependency
 
 - [Google SDK](https://cloud.google.com/sdk/docs)
@@ -57,6 +56,11 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 - [Google Cloud Nat](https://cloud.google.com/nat)
 - [Github Actions](https://github.com/features/actions)
 
+## Document 
+
+- [Document](https://zapp.epics.dev/)
+
+
 
 ## Installation
 
@@ -66,6 +70,7 @@ $ cargo install zapp
 
 ```bash
 zapp --help
+zapp 0.4.2
 EpicsDAO
 Rust Serverless Framework
 
@@ -81,6 +86,7 @@ SUBCOMMANDS:
     db         
     docker     
     g          
+    gcloud     
     gh         
     help       Print this message or the help of the given subcommand(s)
     iam        
@@ -268,10 +274,10 @@ If you have never used Google Cloud before, use this link to create a project.
 
 ### 6. Setup Cloud Compute Network
 ```bash
-$ zapp compute setup
+$ zapp gcloud setup
 ```
 
-### 7. Deploy with Github Actions Workflow
+### 7. Deploy with Github Actions
 
 GitHub Actions starts when you make changes at `main` branch.
 
