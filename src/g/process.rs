@@ -165,7 +165,7 @@ use serde::{{Deserialize, Serialize}};
 pub struct Model {{
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    // Define schema here
+    pub id: i32
 }}
 
 #[derive(Copy, Clone, Debug, EnumIter)]
