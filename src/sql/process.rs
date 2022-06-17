@@ -6,7 +6,9 @@ use std::fs;
 use std::io;
 use std::io::Write;
 use std::str;
+use spinners::{Spinner, Spinners};
 use tokio::process::Command;
+use crate::style_print::*;
 
 #[derive(Debug)]
 pub struct EnvProduction {
@@ -32,12 +34,8 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     .parse()
     .expect("Please input DB Root Password:");
   let zone = String::from(region) + "-b";
-  println!(
-    "⏰ {}",
-    style("Creating Cloud SQL ...\nThis process takes 5 to 10 min.")
-      .white()
-      .bold()
-  );
+  let mut sp = Spinner::new(Spinners::Aesthetic, "Creating Cloud SQL ...\nThis process takes 5 to 10 min.".into());
+
   let instance_name = String::from(service_name) + "-db";
   let db_version = String::from("--database-version=POSTGRES_14");
   let output = Command::new("gcloud")
@@ -66,33 +64,35 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
+          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          println!(
-            "✅ {}",
-            style("Successfully created Cloud SQL!").white().bold()
-          );
+          sp.stop();
+          log_success("Successfully created Cloud SQL!").await
         }
       }
     }
-    Err(err) => println!("error = {:?}", err),
+    Err(err) => {
+      sp.stop();
+      println!("error = {:?}", err)
+    },
   }
   let internal_ip = get_instance_ip(project_id, service_name, 1).await;
-  let database_url = String::from("DATABASE_URL='postgres://postgres:")
+  let database_url = String::from("DATABASE_URL=\"postgres://postgres:")
     + &db_password
     + "@"
     + &internal_ip
     + ":5432/"
     + &instance_name
-    + "\n";
-  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=/cloudsql/")
+    + "\"\n";
+  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=\"/cloudsql/")
     + &project_id
     + ":"
     + &region
     + ":"
     + &instance_name
-    + "\n";
+    + "\"\n";
   let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id + "\n";
   let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name + "\n";
   let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region + "\n";
@@ -133,6 +133,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       panic!("No action name!");
     }
   };
+  let mut sp = Spinner::new(Spinners::Aesthetic, "Patching Cloud SQL ...\nThis process takes 5 to 10 min.".into());
   let output = Command::new("gcloud")
     .args(&[
       "sql",
@@ -152,17 +153,19 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
+          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          println!(
-            "✅ {}",
-            style("Successfully patched Cloud SQL!").white().bold()
-          );
+          sp.stop();
+          log_success("Successfully patched Cloud SQL!").await
         }
       }
     }
-    Err(err) => println!("error = {:?}", err),
+    Err(err) => {
+      sp.stop();
+      println!("error = {:?}", err)
+    },
   }
 }
 
@@ -222,10 +225,7 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
           panic!("{:?}", err.unwrap())
         }
         false => {
-          println!(
-            "✅ {}",
-            style("Successfully created IP range!").white().bold()
-          );
+          log_success("Successfully created IP range!").await
         }
       }
     }
@@ -265,10 +265,7 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
           panic!("{:?}", err.unwrap())
         }
         false => {
-          println!(
-            "✅ {}",
-            style("Successfully connected to VPC!").white().bold()
-          );
+          log_success("Successfully connected to VPC!").await
         }
       }
     }
@@ -277,12 +274,7 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
 }
 
 pub async fn process_assign_network(project_id: &str, service_name: &str) {
-  println!(
-    "⏰ {}",
-    style("Assign network ...\nThis process takes 5 to 10 min.")
-      .white()
-      .bold()
-  );
+  let mut sp = Spinner::new(Spinners::Aesthetic, "Assign network ...\nThis process takes 5 to 10 min.".into());
   let instance_name = String::from(service_name) + "-db";
   let network = String::from("--network=") + service_name;
   let output = Command::new("gcloud")
@@ -304,17 +296,19 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
+          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          println!(
-            "✅ {}",
-            style("Successfully Assigned Network!").white().bold()
-          );
+          sp.stop();
+          log_success("Successfully Assigned Network!").await
         }
       }
     }
-    Err(err) => println!("error = {:?}", err),
+    Err(err) => {
+      sp.stop();
+      println!("error = {:?}", err)
+    },
   }
 }
 
