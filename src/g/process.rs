@@ -383,7 +383,7 @@ pub async fn process_create_query_route() {
         .collect::<Vec<_>>();
 
     let file_path = "src/graphql/query/mod.rs";
-    let content1 = b"use entity::async_graphql\n\npub mod common;\n";
+    let content1 = b"use entity::async_graphql;\n\npub mod common;\n";
     let mut file = fs::File::create(&file_path).unwrap();
     file.write_all(content1).unwrap();
 
