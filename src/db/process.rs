@@ -2,15 +2,12 @@ use tokio::process::Command;
 use crate::style_print::*;
 use regex::Regex;
 use std::str;
-use spinners::{Spinner, Spinners};
 
 fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
 }
 
 pub async fn process_db_migrate() {
-    // let mut sp = Spinner::new(Spinners::Aesthetic, "Migrating ...\n".into());
-    // sp.stop();
     let output = Command::new("sea-orm-cli")
         .args(&[
         "migrate",
