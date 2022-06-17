@@ -9,7 +9,8 @@ fn regex(re_str: &str) -> Regex {
 }
 
 pub async fn process_db_migrate() {
-    let mut sp = Spinner::new(Spinners::Aesthetic, "Migrating ...\n".into());
+    // let mut sp = Spinner::new(Spinners::Aesthetic, "Migrating ...\n".into());
+    // sp.stop();
     let output = Command::new("sea-orm-cli")
         .args(&[
         "migrate",
@@ -19,21 +20,18 @@ pub async fn process_db_migrate() {
         .await;
     match &output {
         Ok(val) => {
-            let err = str::from_utf8(&val.stdout).unwrap();
-            let rt = regex("Running");
-            match rt.is_match(err) {
+            let err2 = str::from_utf8(&val.stderr).unwrap();
+            let rt = regex("error:");
+            match rt.is_match(err2) {
                 true => {
-                    sp.stop();
-                    log_success("Successfully DB Migrated!").await;
+                    log_error(err2).await
                 }
                 false => {
-                    sp.stop();
-                    panic!("{:?}", err)
+                    log_success("Successfully DB Migrated!").await
                 }
               }
             }
         Err(err) => {
-            sp.stop();
             panic!("error = {:?}", err)
         }
     }
@@ -49,19 +47,21 @@ pub async fn process_db_reset() {
         .await;
     match &output {
         Ok(val) => {
-            let err = str::from_utf8(&val.stdout).unwrap();
-            let rt = regex("Running");
-            match rt.is_match(err) {
+            let err2 = str::from_utf8(&val.stderr).unwrap();
+            let rt = regex("error:");
+            match rt.is_match(err2) {
                 true => {
-                    log_success("Successfully DB reset!").await;
+                    log_error(err2).await
                 }
                 false => {
-                    panic!("{:?}", err)
+                    log_success("Successfully DB reset!").await
                 }
-              }
+                }
             }
-        Err(err) => panic!("error = {:?}", err)
+        Err(err) => {
+            panic!("error = {:?}", err)
         }
+    }
 }
 
 pub async fn process_db_refresh() {
@@ -74,19 +74,21 @@ pub async fn process_db_refresh() {
         .await;
     match &output {
         Ok(val) => {
-            let err = str::from_utf8(&val.stdout).unwrap();
-            let rt = regex("Running");
-            match rt.is_match(err) {
+            let err2 = str::from_utf8(&val.stderr).unwrap();
+            let rt = regex("error:");
+            match rt.is_match(err2) {
                 true => {
-                    log_success("Successfully DB refreshed!").await;
+                    log_error(err2).await
                 }
                 false => {
-                    panic!("{:?}", err)
+                    log_success("Successfully DB refreshed!").await
                 }
-              }
+                }
             }
-        Err(err) => panic!("error = {:?}", err)
+        Err(err) => {
+            panic!("error = {:?}", err)
         }
+    }
 }
 
 pub async fn process_db_rollback() {
@@ -99,17 +101,19 @@ pub async fn process_db_rollback() {
         .await;
     match &output {
         Ok(val) => {
-            let err = str::from_utf8(&val.stdout).unwrap();
-            let rt = regex("Running");
-            match rt.is_match(err) {
+            let err2 = str::from_utf8(&val.stderr).unwrap();
+            let rt = regex("error:");
+            match rt.is_match(err2) {
                 true => {
-                    log_success("Successfully DB rollbacked!").await;
+                    log_error(err2).await
                 }
                 false => {
-                    panic!("{:?}", err)
+                    log_success("Successfully DB rollbacked!").await
                 }
-              }
+                }
             }
-        Err(err) => panic!("error = {:?}", err)
+        Err(err) => {
+            panic!("error = {:?}", err)
         }
+    }
 }

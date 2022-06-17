@@ -5,7 +5,6 @@ use std::fs;
 use std::io;
 use std::io::Write;
 use std::str;
-use spinners::{Spinner, Spinners};
 use tokio::process::Command;
 
 #[derive(Debug)]
@@ -32,8 +31,8 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     .parse()
     .expect("Please input DB Root Password:");
   let zone = String::from(region) + "-b";
-  let mut sp = Spinner::new(Spinners::Aesthetic, "Creating Cloud SQL ...\nThis process takes 5 to 10 min.\n".into());
-
+ 
+  log_new("Createting Cloud SQL ...\nThis process takes 5 to 10 min.").await;
   let instance_name = String::from(service_name) + "-db";
   let db_version = String::from("--database-version=POSTGRES_14");
   let output = Command::new("gcloud")
@@ -57,7 +56,6 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     .output()
     .await;
 
-  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
@@ -130,7 +128,8 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       panic!("No action name!");
     }
   };
-  let mut sp = Spinner::new(Spinners::Aesthetic, "Patching Cloud SQL ...\nThis process takes 5 to 10 min.\n".into());
+
+  log_new("Patching Cloud SQL ...\nThis process takes 5 to 10 min.").await;
   let output = Command::new("gcloud")
     .args(&[
       "sql",
@@ -145,7 +144,6 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
     .output()
     .await;
 
-  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
@@ -160,7 +158,6 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
       }
     }
     Err(err) => {
-      sp.stop();
       println!("error = {:?}", err)
     },
   }
@@ -265,7 +262,8 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
 }
 
 pub async fn process_assign_network(project_id: &str, service_name: &str) {
-  let mut sp = Spinner::new(Spinners::Aesthetic, "Assign network ...\nThis process takes 5 to 10 min.\n".into());
+ 
+  log_new("Assign network ...\nThis process takes 5 to 10 min.").await;
   let instance_name = String::from(service_name) + "-db";
   let network = String::from("--network=") + service_name;
   let output = Command::new("gcloud")
@@ -282,7 +280,6 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
     .output()
     .await;
 
-  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
