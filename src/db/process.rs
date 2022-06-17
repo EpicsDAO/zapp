@@ -9,7 +9,7 @@ fn regex(re_str: &str) -> Regex {
 }
 
 pub async fn process_db_migrate() {
-    let mut sp = Spinner::new(Spinners::Aesthetic, "Migrating..".into());
+    let mut sp = Spinner::new(Spinners::Aesthetic, "Migrating ...\n".into());
     let output = Command::new("sea-orm-cli")
         .args(&[
         "migrate",

@@ -144,6 +144,9 @@ async fn main() {
                     process_docker_build(&gcp.project_id, &gcp.service_name, &gcp.gcr_region())
                         .await;
                 }
+                DockerCommands::Restart => {
+                    process_docker_restart().await;
+                }
                 DockerCommands::Push => {
                     let gcp = get_gcp().await;
                     process_docker_push(&gcp.project_id, &gcp.service_name, &gcp.gcr_region())
@@ -203,7 +206,8 @@ async fn main() {
                     process_db_migrate().await;
                 }
                 DbCommands::Reset => {
-                    process_db_reset().await;
+                    process_docker_restart().await;
+                    process_db_migrate().await;
                 }
                 DbCommands::Refresh => {
                     process_db_refresh().await;

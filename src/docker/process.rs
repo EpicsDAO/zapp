@@ -1,6 +1,6 @@
 use tokio::process::Command;
 use std::str;
-use console::style;
+use crate::style_print::*;
 
 pub async fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
   let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
@@ -26,6 +26,18 @@ pub async fn create_docker_network() {
     .output()
     .await;
 }
+
+pub async fn process_docker_restart() {
+  let _output = Command::new("docker")
+    .args(&["rm", "-f", "zapp-psql"])
+    .output()
+    .await;
+  let _output2 = Command::new("zapp")
+    .args(&["docker", "psql"])
+    .output()
+    .await;
+}
+
 
 pub async fn process_docker_psql() {
   let output = Command::new("docker")
@@ -57,11 +69,7 @@ pub async fn process_docker_psql() {
       match out.unwrap() {
         "" => println!("{:?}", err.unwrap().trim()),
         _ => {
-          println!(
-            "✅ {} {}",
-            style("PostgreSQL Container Created:").white().bold(),
-            style(out.unwrap().trim()).white().bold()
-          );
+          log_success(&format!("PostgreSQL Container Created: {}", out.unwrap())).await;
         }
       }
     },

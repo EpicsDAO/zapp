@@ -157,6 +157,7 @@ pub enum RunCommands {
 pub enum DockerCommands {
     Psql,
     Build,
+    Restart,
     Push,
     Help,
 }
