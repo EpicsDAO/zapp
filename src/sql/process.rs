@@ -56,23 +56,22 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     ])
     .output()
     .await;
+
+  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          sp.stop();
           log_success("Successfully created Cloud SQL!").await
         }
       }
     }
     Err(err) => {
-      sp.stop();
       println!("error = {:?}", err)
     },
   }
@@ -145,17 +144,17 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
     ])
     .output()
     .await;
+
+  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          sp.stop();
           log_success("Successfully patched Cloud SQL!").await
         }
       }
@@ -282,23 +281,22 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
     ])
     .output()
     .await;
+
+  sp.stop();
   match &output {
     Ok(val) => {
       let err = str::from_utf8(&val.stderr);
       let rt = regex("ERROR:");
       match rt.is_match(err.unwrap()) {
         true => {
-          sp.stop();
           panic!("{:?}", err.unwrap())
         }
         false => {
-          sp.stop();
           log_success("Successfully Assigned Network!").await
         }
       }
     }
     Err(err) => {
-      sp.stop();
       println!("error = {:?}", err)
     },
   }
