@@ -6,6 +6,11 @@ use crate::style_print::*;
 use std::io;
 use std::path::Path;
 use std::fs::OpenOptions;
+use convert_case::{Case, Casing};
+
+pub fn to_upper_camel(s: &str) -> String {
+    s.to_case(Case::UpperCamel)
+}
 
 pub async fn process_create_migration(model: &str) {
   let dt = Local::now();
@@ -69,14 +74,6 @@ impl MigrationTrait for Migration {{
   edit_migration_lib().await;
 }
 
-fn some_kind_of_uppercase_first_letter(s: &str) -> String {
-  let mut c = s.chars();
-  match c.next() {
-      None => String::new(),
-      Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
-  }
-}
-
 pub async fn edit_migration_lib() {
     let content1 = b"pub use sea_orm_migration::prelude::*;\n\npub struct Migrator;\n\n";
     let dir = "migration/src/";
@@ -132,7 +129,7 @@ impl MigratorTrait for Migrator {
 }
 
 pub async fn process_create_entity(model: &str) {
-  let capital_model = some_kind_of_uppercase_first_letter(model);
+  let capital_model = to_upper_camel(model);
   let filename = format!("{}.rs", model);
   let file_dir = "entity/src/";
   fs::create_dir_all(file_dir).unwrap_or_else(|why| {
@@ -178,7 +175,7 @@ impl Entity {{
 }
 
 pub async fn process_create_mutation(model: &str) {
-  let capital_model = some_kind_of_uppercase_first_letter(model);
+  let capital_model = to_upper_camel(model);
   let filename = format!("{}.rs", model);
   let file_dir = "src/graphql/mutation/";
   fs::create_dir_all(file_dir).unwrap_or_else(|why| {
@@ -186,24 +183,16 @@ pub async fn process_create_mutation(model: &str) {
   });
   let file_path = String::from(file_dir) + &filename;
   let file_content = format!("use async_graphql::{{Context, Object, Result}};
-use entity::async_graphql::{{self, InputObject, SimpleObject}};
+use entity::async_graphql::{{self, InputObject}};
 use entity::{};
 use sea_orm::{{ActiveModelTrait, Set}};
-
+use crate::graphql::mutation::common::*;
 use crate::db::Database;
 
-// I normally separate the input types into separate files/modules, but this is just
-// a quick example.
 
 #[derive(InputObject)]
 pub struct Create{}Input {{
   // Define schema here
-}}
-
-#[derive(SimpleObject)]
-pub struct DeleteResult {{
-    pub success: bool,
-    pub rows_affected: u64,
 }}
 
 #[derive(Default)]
@@ -249,7 +238,7 @@ impl {}Mutation {{
 }
 
 pub async fn process_create_query(model: &str) {
-  let capital_model = some_kind_of_uppercase_first_letter(model);
+  let capital_model = to_upper_camel(model);
   let filename = format!("{}.rs", model);
   let file_dir = "src/graphql/query/";
   fs::create_dir_all(file_dir).unwrap_or_else(|why| {
@@ -259,7 +248,7 @@ pub async fn process_create_query(model: &str) {
   let file_content = format!("use async_graphql::{{Context, Object, Result}};
 use entity::{{async_graphql, {}}};
 use sea_orm::EntityTrait;
-
+use crate::graphql::mutation::common::*;
 use crate::db::Database;
 
 #[derive(Default)]
@@ -328,7 +317,7 @@ pub async fn process_create_mutation_route() {
     }
 
     let file_path2 = "entity/src/lib.rs";
-    let content1 = b"pub use async_graphql;\n\n";
+    let content1 = b"pub use async_graphql;\n";
     let mut file = fs::File::create(&file_path2).unwrap();
     file.write_all(content1).unwrap();
     for model in &mutation_box {
@@ -350,7 +339,7 @@ pub async fn process_create_mutation_route() {
     for model in &mutation_box {
         let name = model.split(".")
             .collect::<Vec<_>>();
-        let content3 = format!("pub use {}::{}Mutation;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let content3 = format!("pub use {}::{}Mutation;\n", &name[0], to_upper_camel(&name[0]));
         let mut add_line = OpenOptions::new()
             .append(true)
             .open(file_path)
@@ -366,7 +355,7 @@ pub async fn process_create_mutation_route() {
     add_line.write_all(content4).unwrap();
     let capital_box = mutation_box.iter().cloned()
         .map(|i|{
-            some_kind_of_uppercase_first_letter(&i)
+            to_upper_camel(&i)
         })
         .collect::<Vec<_>>();
     let last_line = capital_box.iter().cloned()
@@ -414,7 +403,7 @@ pub async fn process_create_query_route() {
     for model in &query_box {
         let name = model.split(".")
             .collect::<Vec<_>>();
-        let content3 = format!("pub use {}::{}Query;\n", &name[0], some_kind_of_uppercase_first_letter(&name[0]));
+        let content3 = format!("pub use {}::{}Query;\n", &name[0], to_upper_camel(&name[0]));
         let mut add_line = OpenOptions::new()
             .append(true)
             .open(file_path)
@@ -430,7 +419,7 @@ pub async fn process_create_query_route() {
     add_line.write_all(content4).unwrap();
     let capital_box = query_box.iter().cloned()
         .map(|i|{
-            some_kind_of_uppercase_first_letter(&i)
+            to_upper_camel(&i)
         })
         .collect::<Vec<_>>();
     let last_line = capital_box.iter().cloned()
