@@ -297,6 +297,7 @@ pub async fn process_create_mutation_route() {
     let files = read_dir(dir).await.unwrap();
     let mutation_box = files.iter().cloned()
         .filter(|i| i != "mod.rs")
+        .filter(|i| i != "common.rs")
         .map(|i| {i.replace(".rs", "")})
         .collect::<Vec<_>>();
 
@@ -377,6 +378,7 @@ pub async fn process_create_query_route() {
     let files = read_dir(dir).await.unwrap();
     let query_box = files.iter().cloned()
         .filter(|i| i != "mod.rs")
+        .filter(|i| i != "common.rs")
         .map(|i| {i.replace(".rs", "")})
         .collect::<Vec<_>>();
 
