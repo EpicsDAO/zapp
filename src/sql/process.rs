@@ -1,6 +1,5 @@
 use crate::gh::process_setup_secret;
 use crate::style_print::*;
-use console::style;
 use regex::Regex;
 use std::fs;
 use std::io;
@@ -8,7 +7,6 @@ use std::io::Write;
 use std::str;
 use spinners::{Spinner, Spinners};
 use tokio::process::Command;
-use crate::style_print::*;
 
 #[derive(Debug)]
 pub struct EnvProduction {
@@ -234,12 +232,6 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
 }
 
 pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str) {
-  println!(
-    "⏰ {}",
-    style("Connecting to VPC Connector ...\nThis process takes 5 to 10 min.")
-      .white()
-      .bold()
-  );
   let ip_range_name = String::from(service_name) + "-ip-range";
   let network = String::from("--network=") + service_name;
   let output = Command::new("gcloud")
