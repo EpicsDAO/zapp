@@ -326,13 +326,18 @@ pub async fn process_create_mutation_route() {
             .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
+
+    let file_path2 = "entity/src/lib.rs";
+    let content1 = b"pub use async_graphql;\n\n";
+    let mut file = fs::File::create(&file_path2).unwrap();
+    file.write_all(content1).unwrap();
     for model in &mutation_box {
         let name = model.split(".")
             .collect::<Vec<_>>();
         let content2 = format!("\npub mod {};", &name[0]);
         let mut add_line = OpenOptions::new()
             .append(true)
-            .open("entity/src/lib.rs")
+            .open(file_path2)
             .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
