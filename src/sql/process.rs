@@ -81,7 +81,7 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     + ":5432/"
     + &instance_name
     + "\"\n";
-  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=\"/cloudsql/")
+  let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=\"")
     + &project_id
     + ":"
     + &region
