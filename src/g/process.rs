@@ -289,7 +289,6 @@ pub async fn process_create_query(model: &str) {
         "use async_graphql::{{Context, Object, Result}};
 use entity::{{async_graphql, {}}};
 use sea_orm::EntityTrait;
-use crate::graphql::mutation::common::*;
 use crate::db::Database;
 
 #[derive(Default)]
@@ -419,7 +418,7 @@ pub async fn process_create_query_route() {
     query_box.sort();
 
     let file_path = "src/graphql/query/mod.rs";
-    let content1 = b"use entity::async_graphql;\n\npub mod common;\n";
+    let content1 = b"use entity::async_graphql;\n\n";
     let mut file = fs::File::create(&file_path).unwrap();
     file.write_all(content1).unwrap();
 

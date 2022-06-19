@@ -61,7 +61,6 @@ Powered by Rust, Aysnc-GraphQL, SeaORM, Axum, and Google Cloud.
 - [Document](https://zapp.epics.dev/)
 
 
-
 ## Installation
 
 ```bash
@@ -69,8 +68,8 @@ $ cargo install zapp
 ```
 
 ```bash
-zapp --help
-zapp 0.4.2
+$ zapp --help
+zapp 0.5.6
 EpicsDAO
 Rust Serverless Framework
 
@@ -149,76 +148,6 @@ $ zapp g model user
 ✅ Successfully added mutation route: src/graphql/query/mod.rs
 ```
 
-### 1. Define DB Schema
-
-`entity/src/user.rs`
-```rust
-・
-・
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, SimpleObject)]
-#[sea_orm(table_name = "users")]
-#[graphql(concrete(name = "User", params()))]
-pub struct Model {
-    #[sea_orm(primary_key)]
-    #[serde(skip_deserializing)]
-    pub id: i32,
-    pub username: String,
-    pub email: String
-}
-・
-・
-```
-
-### 2. Define Mutation Input
-`graphql/src/mutation/user.rs`
-```rust
-・
-・
-#[derive(InputObject)]
-pub struct CreateUserInput {
-    pub username: String,
-    pub email: String
-}
-・
-・
-```
-
-### 3. Define Mutation method
-```rust
-・
-・
-#[Object]
-impl UserMutation {
-    pub async fn create_user(
-        &self,
-        ctx: &Context<'_>,
-        input: CreateUserInput,
-    ) -> Result<task::Model> {
-        let db = ctx.data::<Database>().unwrap();
-
-        let user = user::ActiveModel {
-            username: Set(input.username),
-            email: Set(input.email),
-            ..Default::default()
-        };
-
-        Ok(user.insert(db.get_connection()).await?)
-    }
-    ・
-    ・
-```
-
-
-### 4. DB Migrate
-
-DB Migrate
-```bash
-$ zapp db migrate
-✅ Successfully DB migrated
-```
-
-Now your GraphQL Mutation/Query is ready!
-
 <p>
   <a aria-label="Async GraphQL">
     <img src="https://storage.googleapis.com/zapp-bucket/img/graphql.gif">
@@ -226,68 +155,8 @@ Now your GraphQL Mutation/Query is ready!
 </p>
 
 
+- [Document](https://zapp.epics.dev/)
 
-## Deploy to Google Cloud Run
-
-### 1. Github CLI Auth Login
-
-```bash
-$ gh auth login
-```
-
-### 2. Gcloud Auth Login
-
-```bash
-$ gcloud auth login
-```
-
-
-### 3. Generate Your Application
-```bash
-$ zapp new YOURAPP
-$ cd YOURAPP
-```
-
-### 4. Create GitHub
-
-Let's create a new repository on GitHub.
-
-[GitHub link](https://github.com)
-
-After creating a new repository on the above site, upload the source code with the following command.
-
-Run from the mother directory.
-
-```bash
-$ git add .
-$ git commit -m 'first commit'
-$ git remote add origin git@github.com:YOURREPO/YOURAPP.git
-$ git push origin main
-```
-
-### 5. Create A Google Cloud Project
-
-If you have never used Google Cloud before, use this link to create a project.
-
-[How to create a project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
-
-
-### 6. Setup Cloud Compute Network
-```bash
-$ zapp gcloud setup
-```
-
-### 7. Deploy with Github Actions
-
-GitHub Actions starts when you make changes at `main` branch.
-
-```bash
-$ git add .
-$ git commit -m 'first deploy'
-$ git push origin main
-```
-
-Your APP is all set!
 
 
 ## Contributing
