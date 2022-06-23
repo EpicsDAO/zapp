@@ -19,10 +19,11 @@ pub struct GcpConfig {
   pub project_id: String,
   pub service_name: String,
   pub region: String,
+  pub network: String
 }
 
 pub async fn process_init_gcp_config() {
-  let msg1 = "Please input your GCP project_id:";
+  let msg1 = "Please Input Your GCP Project ID:";
   log_input(msg1).await;
   let mut project_id = String::new();
   io::stdin()
@@ -31,9 +32,9 @@ pub async fn process_init_gcp_config() {
   let project_id: String = project_id
     .trim()
     .parse()
-    .expect("Please input your GCP project_id:");
+    .expect("Please Input Your GCP Project ID:");
 
-  let msg2 = "Please input your GCP service_name:";
+  let msg2 = "Please Input Your GCP Service Name:";
   log_input(msg2).await;
 
   let mut service_name = String::new();
@@ -45,7 +46,7 @@ pub async fn process_init_gcp_config() {
     .parse()
     .expect("Please input your GCP service_name:");
 
-  let msg3 = "Please input your GCP region:";
+  let msg3 = "Please Input Your GCP Region:";
   log_input(msg3).await;
   let mut region = String::new();
   io::stdin()
@@ -54,9 +55,20 @@ pub async fn process_init_gcp_config() {
   let region: String = region
     .trim()
     .parse()
-    .expect("Please input your GCP region:");
+    .expect("Please Input Your GCP Region:");
 
-  let json_struct = build_gcp_config(project_id, service_name, region).await;
+  let msg4 = "Please Input Your GCP Network:";
+  log_input(msg4).await;
+  let mut network = String::new();
+  io::stdin()
+    .read_line(&mut network)
+    .expect("Failed to read line");
+  let network: String = network
+    .trim()
+    .parse()
+    .expect("Please input your GCP Network:");
+
+  let json_struct = build_gcp_config(project_id, service_name, region, network).await;
   let result = write_gcp_config(json_struct).await;
   match result {
     Ok(..) => {
@@ -76,11 +88,12 @@ async fn write_gcp_config(json_struct: GcpConfig) -> std::io::Result<()> {
   Ok(())
 }
 
-async fn build_gcp_config(project_id: String, service_name: String, region: String) -> GcpConfig {
+async fn build_gcp_config(project_id: String, service_name: String, region: String, network: String) -> GcpConfig {
   GcpConfig {
     project_id,
     service_name,
     region,
+    network
   }
 }
 

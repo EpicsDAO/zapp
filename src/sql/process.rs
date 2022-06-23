@@ -14,13 +14,14 @@ pub struct EnvProduction {
   pub zapp_gcp_project_id: String,
   pub zapp_service_name: String,
   pub zapp_gcp_region: String,
+  pub zapp_network_name: String
 }
 
 fn regex(re_str: &str) -> Regex {
   Regex::new(re_str).unwrap()
 }
 
-pub async fn process_create_sql(project_id: &str, service_name: &str, region: &str) {
+pub async fn process_create_sql(project_id: &str, service_name: &str, region: &str, network: &str) {
   log_input("Please input your DB Root Password:").await;
   let mut db_password = String::new();
   io::stdin()
@@ -91,13 +92,14 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
   let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id + "\n";
   let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name + "\n";
   let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region + "\n";
-
+  let zapp_network_name = String::from("ZAPP_NETWORK_NAME=") + &network + "\n"; 
   let env_production = EnvProduction {
     database_url,
     zapp_gcloudsql_instance,
     zapp_gcp_project_id,
     zapp_service_name,
     zapp_gcp_region,
+    zapp_network_name
   };
   let filename = ".env.production";
   let mut file = fs::File::create(filename).unwrap();

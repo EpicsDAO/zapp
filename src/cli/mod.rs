@@ -7,6 +7,7 @@ pub struct GcpConfig {
     pub project_id: String,
     pub service_name: String,
     pub region: String,
+    pub network: String
 }
 
 fn regex(re_str: &str) -> Regex {
