@@ -161,6 +161,7 @@ pub async fn process_enable_permissions(project_id: &str) {
     "cloudfunctions.googleapis.com",
     "cloudbuild.googleapis.com",
     "spanner.googleapis.com",
+    "automl.googleapis.com"
   ];
   for service_name in service_urls {
     let output = Command::new("gcloud")
