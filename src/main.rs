@@ -43,7 +43,6 @@ async fn main() {
             let iam_cmd = iam.command.unwrap_or(IamCommands::Help);
             match iam_cmd {
                 IamCommands::Setup => {
-                    process_init_gcp_config().await;
                     process_create_service_account(
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
@@ -163,7 +162,13 @@ async fn main() {
             let sql_cmd = sql.command.unwrap_or(SqlCommands::Help);
             match sql_cmd {
                 SqlCommands::Create => {
-                    process_create_sql(&gcp.project_id, &gcp.service_name, &gcp.region, &gcp.network).await;
+                    process_create_sql(
+                        &gcp.project_id,
+                        &gcp.service_name,
+                        &gcp.region,
+                        &gcp.network,
+                    )
+                    .await;
                 }
                 SqlCommands::Patch { action } => {
                     process_patch_sql(&gcp.project_id, &gcp.service_name, &action).await;
@@ -250,7 +255,13 @@ pub async fn setup_deployment(gcp: GcpConfig) {
     process_create_external_ip(&gcp.project_id, &gcp.service_name, &gcp.region).await;
     process_create_nat(&gcp.project_id, &gcp.service_name, &gcp.region).await;
     // 3. Create Cloud SQL
-    process_create_sql(&gcp.project_id, &gcp.service_name, &gcp.region, &gcp.network).await;
+    process_create_sql(
+        &gcp.project_id,
+        &gcp.service_name,
+        &gcp.region,
+        &gcp.network,
+    )
+    .await;
     // 4. Create Cloud SQL Private Network
     process_create_ip_range(&gcp.project_id, &gcp.service_name).await;
     process_connect_vpc_connector(&gcp.project_id, &gcp.service_name).await;

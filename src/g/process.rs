@@ -165,7 +165,11 @@ use serde::{{Deserialize, Serialize}};
 pub struct Model {{
     #[sea_orm(primary_key)]
     #[serde(skip_deserializing)]
-    pub id: i32
+    pub id: i32,
+    #[sea_orm(indexed)]
+    pub created_at: DateTime,
+    #[sea_orm(indexed)]
+    pub updated_at: DateTime
 }}
 
 #[derive(Copy, Clone, Debug, EnumIter)]
@@ -207,6 +211,7 @@ pub async fn process_create_mutation(model: &str) {
         "use async_graphql::{{Context, Object, Result}};
 use entity::async_graphql::{{self, InputObject}};
 use entity::{};
+use chrono::Utc;
 use sea_orm::{{ActiveModelTrait, Set}};
 use crate::graphql::mutation::common::*;
 use crate::db::Database;
@@ -228,10 +233,13 @@ impl {}Mutation {{
         input: Create{}Input,
     ) -> Result<{}::Model> {{
         let db = ctx.data::<Database>().unwrap();
+        let naive_date_time = Utc::now().naive_utc();
 
         // Define schema here
         let {} = {}::ActiveModel {{
             id: Set(input.id),
+            created_at: Set(naive_date_time),
+            updated_at: Set(naive_date_time),
             ..Default::default()
         }};
 

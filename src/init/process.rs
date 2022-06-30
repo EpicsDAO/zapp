@@ -19,7 +19,7 @@ pub struct GcpConfig {
   pub project_id: String,
   pub service_name: String,
   pub region: String,
-  pub network: String
+  pub network: String,
 }
 
 pub async fn process_init_gcp_config() {
@@ -88,12 +88,17 @@ async fn write_gcp_config(json_struct: GcpConfig) -> std::io::Result<()> {
   Ok(())
 }
 
-async fn build_gcp_config(project_id: String, service_name: String, region: String, network: String) -> GcpConfig {
+async fn build_gcp_config(
+  project_id: String,
+  service_name: String,
+  region: String,
+  network: String,
+) -> GcpConfig {
   GcpConfig {
     project_id,
     service_name,
     region,
-    network
+    network,
   }
 }
 
@@ -210,16 +215,8 @@ COPY --from=build /{}/target/release/{} .
 CMD [\"./{}\"]",
     app_name, app_name, &underscore_app_name, app_name, app_name, app_name
   );
-  let file_exist = Path::new(&filename).exists();
-  match file_exist {
-    true => {
-      log_error("Error: File already exist!").await;
-    }
-    false => {
-      let mut file = fs::File::create(&filename).unwrap();
-      file.write_all(file_content.as_bytes()).unwrap();
-    }
-  }
+  let mut file = fs::File::create(&filename).unwrap();
+  file.write_all(file_content.as_bytes()).unwrap();
 }
 
 pub async fn endroll(app_name: &str) {
