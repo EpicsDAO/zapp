@@ -124,7 +124,7 @@ pub async fn build_api_workflow(gcr_region: &str) {
 }
 
 pub async fn dl_zapp(app_name: &str) {
-  let version_range = "v0.5";
+  let version_range = "v0.6";
   let zapp_dl_url = format!(
     "https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz",
     version_range
