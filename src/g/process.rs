@@ -246,6 +246,25 @@ impl {}Mutation {{
         Ok({}.insert(db.get_connection()).await?)
     }}
 
+    pub async fn update_{}(
+        &self,
+        ctx: &Context<'_>,
+        id: i32,
+    ) -> Result<{}::Model, Error> {{
+        let db = ctx.data::<Database>().unwrap();
+        let naive_date_time = Utc::now().naive_utc();
+        let {}: Option<{}::Model> =
+            {}::Entity::find_by_id(id)
+                .one(db.get_connection())
+                .await?;
+        let mut {}: {}::ActiveModel = {}.unwrap().into();
+        {}.updated_at = Set(naive_date_time);
+        let {}: {}::Model =
+            {}.update(db.get_connection()).await?;
+
+        Ok({})
+    }}
+
     pub async fn delete_{}(&self, ctx: &Context<'_>, id: i32) -> Result<DeleteResult> {{
         let db = ctx.data::<Database>().unwrap();
 
@@ -269,6 +288,19 @@ impl {}Mutation {{
         capital_model,
         model,
         capital_model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
+        model,
         model,
         model,
         model,
