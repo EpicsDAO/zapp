@@ -1,7 +1,7 @@
 [package]
 name = "zapp"
 description = "Rust Serverless Framework"
-version = "0.6.4"
+version = "0.6.5"
 authors = ["Fumitake Kawasaki <f.kawasaki@elsoul.nl>"]
 edition = "2021"
 license = "Apache-2.0"

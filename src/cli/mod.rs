@@ -156,7 +156,7 @@ pub enum RunCommands {
 
 #[derive(Debug, Subcommand)]
 pub enum DockerCommands {
-    Psql,
+    Psql { service_name: String },
     Build,
     Restart,
     Push,

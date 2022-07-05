@@ -124,7 +124,7 @@ pub async fn build_api_workflow(gcr_region: &str) {
 }
 
 pub async fn dl_zapp(app_name: &str) {
-  let version_range = "v0.6";
+  let version_range = "v0.7";
   let zapp_dl_url = format!(
     "https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz",
     version_range
@@ -214,6 +214,19 @@ COPY --from=build /{}/target/release/{} .
 
 CMD [\"./{}\"]",
     app_name, app_name, &underscore_app_name, app_name, app_name, app_name
+  );
+  let mut file = fs::File::create(&filename).unwrap();
+  file.write_all(file_content.as_bytes()).unwrap();
+}
+
+pub async fn create_env(app_name: &str) {
+  let filename = format!("{}/.env", app_name);
+  let file_content = format!(
+    "DATABASE_URL1=postgres://postgres:postgres@localhost:5432/{}_db
+    PORT=3000
+    SECRET=xxxxxxxxxxxxxx
+    ZAPP_ENV=development",
+    app_name
   );
   let mut file = fs::File::create(&filename).unwrap();
   file.write_all(file_content.as_bytes()).unwrap();

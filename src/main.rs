@@ -23,6 +23,7 @@ async fn main() {
         Commands::New { app_name } => {
             dl_zapp(&app_name).await;
             create_dockerfile(&app_name).await;
+            create_env(&app_name).await;
             endroll(&app_name).await;
         }
         Commands::Gcloud(gcloud) => {
@@ -134,9 +135,9 @@ async fn main() {
         Commands::Docker(docker) => {
             let docker_cmd = docker.command.unwrap_or(DockerCommands::Help);
             match docker_cmd {
-                DockerCommands::Psql => {
+                DockerCommands::Psql { service_name } => {
                     create_docker_network().await;
-                    process_docker_psql().await;
+                    process_docker_psql(&service_name).await;
                 }
                 DockerCommands::Build => {
                     let gcp = get_gcp().await;
