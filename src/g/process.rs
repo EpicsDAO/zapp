@@ -208,7 +208,7 @@ pub async fn process_create_mutation(model: &str) {
     });
     let file_path = String::from(file_dir) + &filename;
     let file_content = format!(
-        "use async_graphql::{{Context, Object, Result}};
+        "use async_graphql::{{Context, Object, Result, Error}};
 use entity::async_graphql::{{self, InputObject}};
 use entity::{};
 use chrono::Utc;
