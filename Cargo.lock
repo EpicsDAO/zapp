@@ -679,7 +679,7 @@ dependencies = [
 
 [[package]]
 name = "zapp"
-version = "0.5.8"
+version = "0.6.3"
 dependencies = [
  "chrono",
  "clap",

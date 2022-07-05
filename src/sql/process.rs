@@ -14,7 +14,7 @@ pub struct EnvProduction {
   pub zapp_gcp_project_id: String,
   pub zapp_service_name: String,
   pub zapp_gcp_region: String,
-  pub zapp_network_name: String
+  pub zapp_network_name: String,
 }
 
 fn regex(re_str: &str) -> Regex {
@@ -32,8 +32,7 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     .parse()
     .expect("Please input DB Root Password:");
   let zone = String::from(region) + "-b";
- 
-  log_new("Createting Cloud SQL ...\nThis process takes 5 to 10 min.").await;
+  log_time("Createting Cloud SQL ...\nThis process takes 5 to 10 min.").await;
   let instance_name = String::from(service_name) + "-db";
   let db_version = String::from("--database-version=POSTGRES_14");
   let output = Command::new("gcloud")
@@ -65,14 +64,12 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
         true => {
           panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully created Cloud SQL!").await
-        }
+        false => log_success("Successfully created Cloud SQL!").await,
       }
     }
     Err(err) => {
       println!("error = {:?}", err)
-    },
+    }
   }
   let internal_ip = get_instance_ip(project_id, service_name, 1).await;
   let database_url = String::from("DATABASE_URL=\"postgres://postgres:")
@@ -92,14 +89,14 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
   let zapp_gcp_project_id = String::from("ZAPP_GCP_PROJECT_ID=") + &project_id + "\n";
   let zapp_service_name = String::from("ZAPP_SERVICE_NAME=") + &service_name + "\n";
   let zapp_gcp_region = String::from("ZAPP_GCP_REGION=") + &region + "\n";
-  let zapp_network_name = String::from("ZAPP_NETWORK_NAME=") + &network + "\n"; 
+  let zapp_network_name = String::from("ZAPP_NETWORK_NAME=") + &network + "\n";
   let env_production = EnvProduction {
     database_url,
     zapp_gcloudsql_instance,
     zapp_gcp_project_id,
     zapp_service_name,
     zapp_gcp_region,
-    zapp_network_name
+    zapp_network_name,
   };
   let filename = ".env.production";
   let mut file = fs::File::create(filename).unwrap();
@@ -131,7 +128,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
     }
   };
 
-  log_new("Patching Cloud SQL ...\nThis process takes 5 to 10 min.").await;
+  log_time("Patching Cloud SQL ...\nThis process takes 5 to 10 min.").await;
   let output = Command::new("gcloud")
     .args(&[
       "sql",
@@ -154,14 +151,12 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
         true => {
           panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully patched Cloud SQL!").await
-        }
+        false => log_success("Successfully patched Cloud SQL!").await,
       }
     }
     Err(err) => {
       println!("error = {:?}", err)
-    },
+    }
   }
 }
 
@@ -220,9 +215,7 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
         true => {
           panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully created IP range!").await
-        }
+        false => log_success("Successfully created IP range!").await,
       }
     }
     Err(err) => println!("error = {:?}", err),
@@ -254,9 +247,7 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
         true => {
           panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully connected to VPC!").await
-        }
+        false => log_success("Successfully connected to VPC!").await,
       }
     }
     Err(err) => println!("error = {:?}", err),
@@ -264,8 +255,7 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
 }
 
 pub async fn process_assign_network(project_id: &str, service_name: &str) {
- 
-  log_new("Assign network ...\nThis process takes 5 to 10 min.").await;
+  log_time("Assign network ...\nThis process takes 5 to 10 min.").await;
   let instance_name = String::from(service_name) + "-db";
   let network = String::from("--network=") + service_name;
   let output = Command::new("gcloud")
@@ -290,14 +280,12 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
         true => {
           panic!("{:?}", err.unwrap())
         }
-        false => {
-          log_success("Successfully Assigned Network!").await
-        }
+        false => log_success("Successfully Assigned Network!").await,
       }
     }
     Err(err) => {
       println!("error = {:?}", err)
-    },
+    }
   }
 }
 

@@ -18,3 +18,5 @@ pub const LAUNCH_EMOJI: Emoji<'_, '_> = Emoji("💃 ", "");
 pub const ERROR_EMOJI: Emoji<'_, '_> = Emoji("🛑 ", "");
 
 pub const FILE_EMOJI: Emoji<'_, '_> = Emoji("🗃️ ", "");
+
+pub const TIME_EMOJI: Emoji<'_, '_> = Emoji("⏱ ", "");
