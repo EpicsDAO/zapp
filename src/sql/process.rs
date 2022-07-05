@@ -72,13 +72,13 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     }
   }
   let internal_ip = get_instance_ip(project_id, service_name, 1).await;
-  let database_url = String::from("DATABASE_URL=\"postgres://postgres:")
+  let database_url = String::from("DATABASE_URL=postgres://postgres:")
     + &db_password
     + "@"
     + &internal_ip
     + ":5432/"
     + &instance_name
-    + "\"\n";
+    + "\n";
   let zapp_gcloudsql_instance = String::from("ZAPP_GCLOUDSQL_INSTANCE=\"")
     + &project_id
     + ":"

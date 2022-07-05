@@ -452,7 +452,6 @@ pub async fn process_create_query_route() {
         .iter()
         .cloned()
         .filter(|i| i != "mod.rs")
-        .filter(|i| i != "common.rs")
         .map(|i| i.replace(".rs", ""))
         .collect::<Vec<_>>();
     query_box.sort();
