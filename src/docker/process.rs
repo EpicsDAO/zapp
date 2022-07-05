@@ -41,7 +41,7 @@ pub async fn process_docker_restart() {
 
 pub async fn process_docker_psql(service_name: &str) {
   let container_name = String::from(service_name) + "-psql";
-  let db_name = String::from(service_name) + "_db";
+  let db_name = String::from("POSTGRES_DB=") + service_name + "_db";
   let output = Command::new("docker")
     .args(&[
       "run",
@@ -58,7 +58,6 @@ pub async fn process_docker_psql(service_name: &str) {
       "-e",
       "POSTGRES_PASSWORD=postgres",
       "-e",
-      "POSTGRES_DB",
       &db_name,
       "--network=zapp",
       "postgres:14.3-alpine",

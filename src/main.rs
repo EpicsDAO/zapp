@@ -135,9 +135,10 @@ async fn main() {
         Commands::Docker(docker) => {
             let docker_cmd = docker.command.unwrap_or(DockerCommands::Help);
             match docker_cmd {
-                DockerCommands::Psql { service_name } => {
+                DockerCommands::Psql => {
+                    let gcp = get_gcp().await;
                     create_docker_network().await;
-                    process_docker_psql(&service_name).await;
+                    process_docker_psql(&gcp.service_name).await;
                 }
                 DockerCommands::Build => {
                     let gcp = get_gcp().await;
