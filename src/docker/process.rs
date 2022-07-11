@@ -40,8 +40,9 @@ pub async fn process_docker_restart() {
 
 
 pub async fn process_docker_psql(service_name: &str) {
+  let underscored_name = service_name.to_string().replace("-","_");
   let container_name = String::from(service_name) + "-psql";
-  let db_name = String::from("POSTGRES_DB=") + service_name + "_db";
+  let db_name = String::from("POSTGRES_DB=") + &underscored_name + "_db";
   let output = Command::new("docker")
     .args(&[
       "run",
