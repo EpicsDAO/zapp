@@ -33,7 +33,7 @@ pub async fn process_create_migration(model: &str) {
 
     // create tokens used in the quasi-templating below
     let model_name_ident = format_ident!("{}", model);
-    let file_name_lit: syn::LitStr = syn::parse_str(&filename).expect("Unable to parse println!() argument");
+
 
     // template the rust code
     let file_content_tokens = quote! {
@@ -58,7 +58,7 @@ pub async fn process_create_migration(model: &str) {
 
         impl MigrationName for Migration {
             fn name(&self) -> &str {
-                #file_name_lit
+                #filename
             }
         }
 
