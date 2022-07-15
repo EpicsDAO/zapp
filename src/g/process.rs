@@ -7,6 +7,7 @@ use std::io;
 use std::io::Write;
 use std::path::Path;
 use std::str;
+use quote::{format_ident, quote};
 
 pub fn to_upper_camel(s: &str) -> String {
     s.to_case(Case::UpperCamel)
@@ -29,72 +30,74 @@ pub async fn process_create_migration(model: &str) {
         println!("! {:?}", why.kind());
     });
     let file_path = String::from(file_dir) + &filename + ".rs";
-    let file_content = format!(
-        "use entity::{};
-use sea_orm::{{DbBackend, EntityTrait, Schema}};
-use sea_orm_migration::prelude::*;
 
-pub struct Migration;
+    // create tokens used in the quasi-templating below
+    let model_name_ident = format_ident!("{}", model);
 
-fn get_seaorm_create_stmt<E: EntityTrait>(e: E) -> TableCreateStatement {{
-    let schema = Schema::new(DbBackend::Postgres);
 
-    schema
-        .create_table_from_entity(e)
-        .if_not_exists()
-        .to_owned()
-}}
+    // template the rust code
+    let file_content_tokens = quote! {
+        use entity::#model_name_ident;
+        use sea_orm::{DbBackend, EntityTrait, Schema};
+        use sea_orm_migration::prelude::*;
 
-fn get_seaorm_drop_stmt<E: EntityTrait>(e: E) -> TableDropStatement {{
-    Table::drop().table(e).if_exists().to_owned()
-}}
+        pub struct Migration;
 
-impl MigrationName for Migration {{
-    fn name(&self) -> &str {{
-        \"m{}{}{}_{}{}{}_create_{}_table\"
-    }}
-}}
+        fn get_seaorm_create_stmt<E: EntityTrait>(e: E) -> TableCreateStatement {
+            let schema = Schema::new(DbBackend::Postgres);
 
-#[async_trait::async_trait]
-impl MigrationTrait for Migration {{
-    async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {{
-        let stmts = vec![get_seaorm_create_stmt({}::Entity)];
+            schema
+                .create_table_from_entity(e)
+                .if_not_exists()
+                .to_owned()
+        }
 
-        for stmt in stmts {{
-            manager.create_table(stmt.to_owned()).await?;
-        }}
+        fn get_seaorm_drop_stmt<E: EntityTrait>(e: E) -> TableDropStatement {
+            Table::drop().table(e).if_exists().to_owned()
+        }
 
-        Ok(())
-    }}
+        impl MigrationName for Migration {
+            fn name(&self) -> &str {
+                #filename
+            }
+        }
 
-    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {{
-        let stmts = vec![get_seaorm_drop_stmt({}::Entity)];
+        #[async_trait::async_trait]
+        impl MigrationTrait for Migration {
+            async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+                let stmts = vec![get_seaorm_create_stmt(#model_name_ident::Entity)];
 
-        for stmt in stmts {{
+                for stmt in stmts {
+                    manager.create_table(stmt.to_owned()).await?;
+                }
+
+                Ok(())
+            }
+
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        let stmts = vec![get_seaorm_drop_stmt(#model_name_ident::Entity)];
+
+        for stmt in stmts {
             manager.drop_table(stmt.to_owned()).await?;
-        }}
+        }
 
         Ok(())
-    }}
-}}",
-        model,
-        dt.format("%Y"),
-        dt.format("%m"),
-        dt.format("%d"),
-        dt.format("%H"),
-        dt.format("%M"),
-        dt.format("%S"),
-        model,
-        model,
-        model
-    );
+    }
+
+}
+};
+    // formatting and pretty printing
+    let syntax_tree = syn::parse_file(&file_content_tokens.to_string()).unwrap();
+    let formatted = prettyplease::unparse(&syntax_tree);
+
+    // write the rust code to the file
     let mut file = fs::File::create(&file_path).unwrap();
-    file.write_all(file_content.as_bytes()).unwrap();
+    file.write_all(formatted.as_bytes()).unwrap();
     log_success(&format!(
         "Successfully created migration file: {}",
         &file_path
     ))
-    .await;
+        .await;
     // Edit migration/src/lib.rs
     edit_migration_lib().await;
 }
@@ -314,7 +317,7 @@ impl {}Mutation {{
         "Successfully created mutation file: {}",
         &file_path
     ))
-    .await;
+        .await;
 }
 
 pub async fn process_create_query(model: &str) {
@@ -442,7 +445,7 @@ pub async fn process_create_mutation_route() {
         "Successfully added mutation route: {}",
         &file_path
     ))
-    .await;
+        .await;
 }
 
 pub async fn process_create_query_route() {
@@ -496,5 +499,5 @@ pub async fn process_create_query_route() {
         "Successfully added mutation route: {}",
         &file_path
     ))
-    .await;
+        .await;
 }
