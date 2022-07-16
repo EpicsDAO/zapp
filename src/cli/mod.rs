@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use clap::{Args, Parser, Subcommand};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -7,7 +8,7 @@ pub struct GcpConfig {
     pub project_id: String,
     pub service_name: String,
     pub region: String,
-    pub network: String
+    pub network: String,
 }
 
 fn regex(re_str: &str) -> Regex {
@@ -174,7 +175,11 @@ pub enum SqlCommands {
 
 #[derive(Debug, Subcommand)]
 pub enum GCommands {
-    Model { model: String },
+    Model {
+        model: String,
+        #[clap(parse(from_os_str), short, long)]
+        path: Option<PathBuf>,
+    },
     Help,
 }
 
