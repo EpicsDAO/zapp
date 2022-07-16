@@ -1,6 +1,6 @@
-use tokio::process::Command;
-use std::str;
 use crate::style_print::*;
+use std::str;
+use tokio::process::Command;
 
 pub async fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
   let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
@@ -38,9 +38,8 @@ pub async fn process_docker_restart() {
     .await;
 }
 
-
 pub async fn process_docker_psql(service_name: &str) {
-  let underscored_name = service_name.to_string().replace("-","_");
+  let underscored_name = service_name.to_string().replace("-", "_");
   let container_name = String::from(service_name) + "-psql";
   let db_name = String::from("POSTGRES_DB=") + &underscored_name + "_db";
   let output = Command::new("docker")
@@ -52,8 +51,6 @@ pub async fn process_docker_psql(service_name: &str) {
       &container_name,
       "-p",
       "5432:5432",
-      "-v",
-      "postgres-tmp:/home/postgresql/data",
       "-e",
       "POSTGRES_USER=postgres",
       "-e",
@@ -75,7 +72,7 @@ pub async fn process_docker_psql(service_name: &str) {
           log_success(&format!("PostgreSQL Container Created: {}", out.unwrap())).await;
         }
       }
-    },
-    Err(err) => println!("error = {:?}", err)
+    }
+    Err(err) => println!("error = {:?}", err),
   }
 }
