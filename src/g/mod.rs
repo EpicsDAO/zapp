@@ -1,5 +1,6 @@
 use std::{fs, io};
 use std::path::Path;
+use chrono::NaiveDateTime;
 use convert_case::{Case, Casing};
 use crate::g::entity::process_entity;
 use crate::g::graphql::mutation::process_graphql_mutation;
@@ -29,9 +30,9 @@ pub(self) fn to_upper_camel(s: &str) -> String {
     s.to_case(Case::UpperCamel)
 }
 
-pub async fn process_g(model: &str, gen_path: &Path) {
+pub async fn process_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     process_entity(model, gen_path).await;
-    process_migration(model, gen_path).await;
+    process_migration(model, dt, gen_path).await;
     process_graphql_query(model, gen_path).await;
     process_graphql_mutation(model, gen_path).await;
 }

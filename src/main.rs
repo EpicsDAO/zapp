@@ -2,6 +2,7 @@ use std::env::current_dir;
 use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
+use chrono::Local;
 use zapp::cli::{
     Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcloudCommands,
     GcpConfig, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
@@ -196,7 +197,8 @@ async fn main() {
                 GCommands::Model { model, path } => {
                     let gen_path_buf = path.unwrap_or_else(|| current_dir().unwrap());
                     let gen_path = gen_path_buf.as_path();
-                    process_g(&model, gen_path).await;
+                    let date = Local::now();
+                    process_g(&model, date.naive_local(), gen_path).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";

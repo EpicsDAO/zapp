@@ -2,19 +2,18 @@ use std::fs;
 use std::fs::{OpenOptions};
 use std::io::Write;
 use std::path::Path;
-use chrono::Local;
+use chrono::NaiveDateTime;
 use quote::{format_ident, quote};
 use syn::File;
 use crate::g::read_dir;
 use crate::style_print::log_success;
 
-pub(in crate::g) async fn process_migration(model: &str, gen_path: &Path) {
-    create_migration(model, gen_path).await;
+pub(in crate::g) async fn process_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+    create_migration(model, dt, gen_path).await;
     register_migration(model, gen_path).await;
 }
 
-async fn create_migration(model: &str, gen_path: &Path) {
-    let dt = Local::now();
+async fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     let filename = format!(
         "m{}{}{}_{}{}{}_create_{}_table",
         dt.format("%Y"),
