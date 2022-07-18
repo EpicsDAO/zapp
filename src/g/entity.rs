@@ -5,7 +5,7 @@ use std::path::Path;
 use crate::g::{read_dir, to_upper_camel};
 use crate::style_print::log_success;
 
-pub(in crate::g)  async fn process_entity(model: &str, gen_path: &Path) {
+pub(in crate::g) async fn process_entity(model: &str, gen_path: &Path) {
     create_entity(model, gen_path).await;
     register_entity(model, gen_path).await;
 }
