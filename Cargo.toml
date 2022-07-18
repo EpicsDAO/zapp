@@ -27,3 +27,6 @@ spinners = "4.0.0"
 quote = "1.0.20"
 syn = "1.0.98"
 prettyplease = "0.1.16"
+
+[dev-dependencies]
+tempdir = "0.3.7"

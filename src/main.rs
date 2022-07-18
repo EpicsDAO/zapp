@@ -1,6 +1,8 @@
+use std::env::current_dir;
 use clap::Parser;
 use std::fs::File;
 use std::io::BufReader;
+use chrono::Local;
 use zapp::cli::{
     Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcloudCommands,
     GcpConfig, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
@@ -48,12 +50,12 @@ async fn main() {
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
                     )
-                    .await;
+                        .await;
                     process_create_service_account_key(
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
                     )
-                    .await;
+                        .await;
                     process_add_roles(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
                     process_enable_permissions(gcp.project_id.as_str()).await;
                     set_keyfile_to_gh_secret().await;
@@ -170,7 +172,7 @@ async fn main() {
                         &gcp.region,
                         &gcp.network,
                     )
-                    .await;
+                        .await;
                 }
                 SqlCommands::Patch { action } => {
                     process_patch_sql(&gcp.project_id, &gcp.service_name, &action).await;
@@ -192,13 +194,11 @@ async fn main() {
         Commands::G(g) => {
             let g_cmd = g.command.unwrap_or(GCommands::Help);
             match g_cmd {
-                GCommands::Model { model } => {
-                    process_create_migration(&model).await;
-                    process_create_entity(&model).await;
-                    process_create_mutation(&model).await;
-                    process_create_query(&model).await;
-                    process_create_mutation_route().await;
-                    process_create_query_route().await;
+                GCommands::Model { model, path } => {
+                    let gen_path_buf = path.unwrap_or_else(|| current_dir().unwrap());
+                    let gen_path = gen_path_buf.as_path();
+                    let date = Local::now();
+                    process_g(&model, date.naive_local(), gen_path).await;
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";
@@ -263,7 +263,7 @@ pub async fn setup_deployment(gcp: GcpConfig) {
         &gcp.region,
         &gcp.network,
     )
-    .await;
+        .await;
     // 4. Create Cloud SQL Private Network
     process_create_ip_range(&gcp.project_id, &gcp.service_name).await;
     process_connect_vpc_connector(&gcp.project_id, &gcp.service_name).await;
