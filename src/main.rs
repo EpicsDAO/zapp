@@ -1,8 +1,8 @@
-use std::env::current_dir;
+use chrono::Local;
 use clap::Parser;
+use std::env::current_dir;
 use std::fs::File;
 use std::io::BufReader;
-use chrono::Local;
 use zapp::cli::{
     Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcloudCommands,
     GcpConfig, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
@@ -50,12 +50,12 @@ async fn main() {
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
                     )
-                        .await;
+                    .await;
                     process_create_service_account_key(
                         gcp.project_id.as_str(),
                         gcp.service_name.as_str(),
                     )
-                        .await;
+                    .await;
                     process_add_roles(gcp.project_id.as_str(), gcp.service_name.as_str()).await;
                     process_enable_permissions(gcp.project_id.as_str()).await;
                     set_keyfile_to_gh_secret().await;
@@ -172,7 +172,7 @@ async fn main() {
                         &gcp.region,
                         &gcp.network,
                     )
-                        .await;
+                    .await;
                 }
                 SqlCommands::Patch { action } => {
                     process_patch_sql(&gcp.project_id, &gcp.service_name, &action).await;
@@ -263,7 +263,7 @@ pub async fn setup_deployment(gcp: GcpConfig) {
         &gcp.region,
         &gcp.network,
     )
-        .await;
+    .await;
     // 4. Create Cloud SQL Private Network
     process_create_ip_range(&gcp.project_id, &gcp.service_name).await;
     process_connect_vpc_connector(&gcp.project_id, &gcp.service_name).await;

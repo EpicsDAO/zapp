@@ -2,44 +2,44 @@ use crate::constants::*;
 use console::style;
 
 pub async fn log_success(text: &str) {
-  println!("{}{}", COMPLETE_EMOJI, style(text).white().bold());
+    println!("{}{}", COMPLETE_EMOJI, style(text).white().bold());
 }
 
 pub async fn log_error(text: &str) {
-  println!("{}{}", ERROR_EMOJI, style(text).white().bold());
+    println!("{}{}", ERROR_EMOJI, style(text).white().bold());
 }
 
 pub async fn log_new(text: &str) {
-  println!(
-    "{}{}{}{}{}{}{}{}{}{}{}{}{}",
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    LAUNCH_EMOJI,
-    style(text).white().bold()
-  );
+    println!(
+        "{}{}{}{}{}{}{}{}{}{}{}{}{}",
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        LAUNCH_EMOJI,
+        style(text).white().bold()
+    );
 }
 
 pub async fn log_white(text: &str) {
-  println!("{}", style(text).blue().bold());
+    println!("{}", style(text).blue().bold());
 }
 
 pub async fn log_input(text: &str) {
-  println!("{}{}", PAPER_EMOJI, style(text).white().bold());
+    println!("{}{}", PAPER_EMOJI, style(text).white().bold());
 }
 
 pub async fn log_time(text: &str) {
-  println!("{}{}", TIME_EMOJI, style(text).white().bold());
+    println!("{}{}", TIME_EMOJI, style(text).white().bold());
 }
 
 pub async fn log_create_file(text: &str) {
-  println!("{}{}", FILE_EMOJI, style(text).white().bold());
+    println!("{}{}", FILE_EMOJI, style(text).white().bold());
 }

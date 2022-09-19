@@ -1,9 +1,9 @@
+use crate::g::{read_dir, to_upper_camel};
+use crate::style_print::log_success;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
-use crate::g::{read_dir, to_upper_camel};
-use crate::style_print::log_success;
 
 pub(in crate::g) async fn process_graphql_query(model: &str, gen_path: &Path) {
     create_query(model, gen_path).await;
@@ -51,7 +51,12 @@ impl {}Query {{
     );
     let mut file = fs::File::create(model_query.as_path()).unwrap();
     file.write_all(file_content.as_bytes()).unwrap();
-    log_success(&format!("Successfully created `{}` GraphQL query file: {}", model, model_query.display())).await;
+    log_success(&format!(
+        "Successfully created `{}` GraphQL query file: {}",
+        model,
+        model_query.display()
+    ))
+    .await;
 }
 
 async fn register_query(model: &str, gen_path: &Path) {
@@ -73,19 +78,31 @@ async fn register_query(model: &str, gen_path: &Path) {
     for model in &query_box {
         let name = model.split(".").collect::<Vec<_>>();
         let content2 = format!("pub mod {};\n", &name[0]);
-        let mut add_line = OpenOptions::new().append(true).open(query_mod_file.as_path()).unwrap();
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(query_mod_file.as_path())
+            .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
-    let mut add_line = OpenOptions::new().append(true).open(query_mod_file.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(query_mod_file.as_path())
+        .unwrap();
     add_line.write_all("\n".as_bytes()).unwrap();
     for model in &query_box {
         let name = model.split(".").collect::<Vec<_>>();
         let content3 = format!("pub use {}::{}Query;\n", &name[0], to_upper_camel(&name[0]));
-        let mut add_line = OpenOptions::new().append(true).open(query_mod_file.as_path()).unwrap();
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(query_mod_file.as_path())
+            .unwrap();
         add_line.write_all(content3.as_bytes()).unwrap();
     }
     let content4 = b"\n#[derive(async_graphql::MergedObject, Default)]";
-    let mut add_line = OpenOptions::new().append(true).open(query_mod_file.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(query_mod_file.as_path())
+        .unwrap();
     add_line.write_all(content4).unwrap();
     let capital_box = query_box
         .iter()
@@ -99,10 +116,15 @@ async fn register_query(model: &str, gen_path: &Path) {
         .collect::<Vec<_>>();
 
     let content5 = format!("\npub struct Query({});", &last_line.join(", "));
-    let mut add_line = OpenOptions::new().append(true).open(query_mod_file.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(query_mod_file.as_path())
+        .unwrap();
     add_line.write_all(&content5.as_bytes()).unwrap();
     log_success(&format!(
-        "Successfully registered GraphQL query for `{}` in {}", model, query_mod_file.display()
+        "Successfully registered GraphQL query for `{}` in {}",
+        model,
+        query_mod_file.display()
     ))
-        .await;
+    .await;
 }

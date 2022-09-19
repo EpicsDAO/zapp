@@ -1,7 +1,7 @@
-use std::path::PathBuf;
 use clap::{Args, Parser, Subcommand};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GcpConfig {

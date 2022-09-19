@@ -1,12 +1,12 @@
-use std::fs;
-use std::fs::{OpenOptions};
-use std::io::Write;
-use std::path::Path;
-use chrono::NaiveDateTime;
-use quote::{format_ident, quote};
-use syn::File;
 use crate::g::read_dir;
 use crate::style_print::log_success;
+use chrono::NaiveDateTime;
+use quote::{format_ident, quote};
+use std::fs;
+use std::fs::OpenOptions;
+use std::io::Write;
+use std::path::Path;
+use syn::File;
 
 pub(in crate::g) async fn process_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     create_migration(model, dt, gen_path).await;
@@ -28,57 +28,56 @@ async fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     // create tokens used in the quasi-templating below
     let model_name_ident = format_ident!("{}", model);
 
-
     // template the rust code
     let file_content_tokens = quote! {
-        use entity::#model_name_ident;
-        use sea_orm::{DbBackend, EntityTrait, Schema};
-        use sea_orm_migration::prelude::*;
+            use entity::#model_name_ident;
+            use sea_orm::{DbBackend, EntityTrait, Schema};
+            use sea_orm_migration::prelude::*;
 
-        pub struct Migration;
+            pub struct Migration;
 
-        fn get_seaorm_create_stmt<E: EntityTrait>(e: E) -> TableCreateStatement {
-            let schema = Schema::new(DbBackend::Postgres);
+            fn get_seaorm_create_stmt<E: EntityTrait>(e: E) -> TableCreateStatement {
+                let schema = Schema::new(DbBackend::Postgres);
 
-            schema
-                .create_table_from_entity(e)
-                .if_not_exists()
-                .to_owned()
-        }
-
-        fn get_seaorm_drop_stmt<E: EntityTrait>(e: E) -> TableDropStatement {
-            Table::drop().table(e).if_exists().to_owned()
-        }
-
-        impl MigrationName for Migration {
-            fn name(&self) -> &str {
-                #filename
+                schema
+                    .create_table_from_entity(e)
+                    .if_not_exists()
+                    .to_owned()
             }
-        }
 
-        #[async_trait::async_trait]
-        impl MigrationTrait for Migration {
-            async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-                let stmts = vec![get_seaorm_create_stmt(#model_name_ident::Entity)];
+            fn get_seaorm_drop_stmt<E: EntityTrait>(e: E) -> TableDropStatement {
+                Table::drop().table(e).if_exists().to_owned()
+            }
+
+            impl MigrationName for Migration {
+                fn name(&self) -> &str {
+                    #filename
+                }
+            }
+
+            #[async_trait::async_trait]
+            impl MigrationTrait for Migration {
+                async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+                    let stmts = vec![get_seaorm_create_stmt(#model_name_ident::Entity)];
+
+                    for stmt in stmts {
+                        manager.create_table(stmt.to_owned()).await?;
+                    }
+
+                    Ok(())
+                }
+
+            async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+                let stmts = vec![get_seaorm_drop_stmt(#model_name_ident::Entity)];
 
                 for stmt in stmts {
-                    manager.create_table(stmt.to_owned()).await?;
+                    manager.drop_table(stmt.to_owned()).await?;
                 }
 
                 Ok(())
             }
-
-        async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-            let stmts = vec![get_seaorm_drop_stmt(#model_name_ident::Entity)];
-
-            for stmt in stmts {
-                manager.drop_table(stmt.to_owned()).await?;
-            }
-
-            Ok(())
         }
-    }
-};
+    };
     // formatting and pretty printing
     let syntax_tree = syn::parse_str::<File>(&file_content_tokens.to_string()).unwrap();
     let formatted = prettyplease::unparse(&syntax_tree);
@@ -94,9 +93,11 @@ async fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     file.write_all(formatted.as_bytes()).unwrap();
 
     log_success(&format!(
-        "Successfully created migration file for model `{}`: {}", model, file_path.display()
+        "Successfully created migration file for model `{}`: {}",
+        model,
+        file_path.display()
     ))
-        .await;
+    .await;
 }
 
 async fn register_migration(model: &str, gen_path: &Path) {
@@ -145,5 +146,10 @@ impl MigratorTrait for Migrator {
     let mut add_line = OpenOptions::new().append(true).open(&file_path).unwrap();
     add_line.write_all(content5).unwrap();
 
-    log_success(&format!("Successfully registered migration file for model `{}` in {}", model, file_path.display())).await;
+    log_success(&format!(
+        "Successfully registered migration file for model `{}` in {}",
+        model,
+        file_path.display()
+    ))
+    .await;
 }
