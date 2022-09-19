@@ -1,13 +1,13 @@
 use console::style;
 use regex::Regex;
+use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
 }
 
-pub async fn process_create_service_account(project_id: &str, service_name: &str) {
+pub fn process_create_service_account(project_id: &str, service_name: &str) {
     let description = String::from("--description='") + service_name + " Service Account'";
     let display_name = String::from("--display-name=") + service_name;
     let output = Command::new("gcloud")
@@ -21,8 +21,8 @@ pub async fn process_create_service_account(project_id: &str, service_name: &str
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -45,7 +45,7 @@ pub async fn process_create_service_account(project_id: &str, service_name: &str
     }
 }
 
-pub async fn process_create_service_account_key(project_id: &str, service_name: &str) {
+pub fn process_create_service_account_key(project_id: &str, service_name: &str) {
     let service_account =
         String::from(service_name) + "@" + project_id + ".iam.gserviceaccount.com";
     let output = Command::new("gcloud")
@@ -60,8 +60,8 @@ pub async fn process_create_service_account_key(project_id: &str, service_name: 
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -82,7 +82,7 @@ pub async fn process_create_service_account_key(project_id: &str, service_name: 
     }
 }
 
-pub async fn process_add_roles(project_id: &str, service_name: &str) {
+pub fn process_add_roles(project_id: &str, service_name: &str) {
     let roles = [
         "roles/cloudsql.editor",
         "roles/containerregistry.ServiceAgent",
@@ -98,15 +98,11 @@ pub async fn process_add_roles(project_id: &str, service_name: &str) {
         "roles/cloudtranslate.admin",
     ];
     for role in roles {
-        process_add_service_account_role(project_id, service_name, role).await;
+        process_add_service_account_role(project_id, service_name, role);
     }
 }
 
-pub async fn process_add_service_account_role(
-    project_id: &str,
-    service_name: &str,
-    role_arg: &str,
-) {
+pub fn process_add_service_account_role(project_id: &str, service_name: &str, role_arg: &str) {
     let member = String::from("--member=serviceAccount:")
         + service_name
         + "@"
@@ -123,8 +119,8 @@ pub async fn process_add_service_account_role(
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -146,7 +142,7 @@ pub async fn process_add_service_account_role(
     }
 }
 
-pub async fn process_enable_permissions(project_id: &str) {
+pub fn process_enable_permissions(project_id: &str) {
     let service_urls = [
         "compute.googleapis.com",
         "iam.googleapis.com",
@@ -170,8 +166,8 @@ pub async fn process_enable_permissions(project_id: &str) {
     for service_name in service_urls {
         let output = Command::new("gcloud")
             .args(&["services", "enable", service_name, "--project", project_id])
-            .output()
-            .await;
+            .output();
+
         match &output {
             Ok(val) => {
                 let err = str::from_utf8(&val.stderr);
@@ -194,10 +190,10 @@ pub async fn process_enable_permissions(project_id: &str) {
     }
 }
 
-pub async fn set_keyfile_to_gh_secret() {
+pub fn set_keyfile_to_gh_secret() {
     let output = Command::new("gh")
         .args(&["secret", "set", "ZAPP_GCP_SA_KEY", "<", "./keyfile.json"])
-        .output()
-        .await;
+        .output();
+
     println!("{:?}", &output);
 }

@@ -8,12 +8,12 @@ use std::io::Write;
 use std::path::Path;
 use syn::File;
 
-pub(in crate::g) async fn process_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
-    create_migration(model, dt, gen_path).await;
-    register_migration(model, gen_path).await;
+pub(in crate::g) fn process_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+    create_migration(model, dt, gen_path);
+    register_migration(model, gen_path);
 }
 
-async fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     let filename = format!(
         "m{}{}{}_{}{}{}_create_{}_table",
         dt.format("%Y"),
@@ -96,16 +96,15 @@ async fn create_migration(model: &str, dt: NaiveDateTime, gen_path: &Path) {
         "Successfully created migration file for model `{}`: {}",
         model,
         file_path.display()
-    ))
-    .await;
+    ));
 }
 
-async fn register_migration(model: &str, gen_path: &Path) {
+fn register_migration(model: &str, gen_path: &Path) {
     let migration_src_dir = gen_path.join("migration").join("src");
     let content1 = b"pub use sea_orm_migration::prelude::*;\n\npub struct Migrator;\n\n";
 
     let file_path = migration_src_dir.join("lib.rs");
-    let files = read_dir(&migration_src_dir).await.unwrap();
+    let files = read_dir(&migration_src_dir).unwrap();
     let mut files_box = files
         .iter()
         .cloned()
@@ -150,6 +149,5 @@ impl MigratorTrait for Migrator {
         "Successfully registered migration file for model `{}` in {}",
         model,
         file_path.display()
-    ))
-    .await;
+    ));
 }

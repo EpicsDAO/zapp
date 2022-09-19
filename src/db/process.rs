@@ -1,5 +1,6 @@
 use crate::style_print::*;
 use regex::Regex;
+use std::process::Command;
 use std::str;
 use tokio::process::Command;
 
@@ -7,18 +8,19 @@ fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
 }
 
-pub async fn process_db_migrate() {
+pub fn process_db_migrate() {
     let output = Command::new("sea-orm-cli")
         .args(&["migrate", "up"])
-        .output()
-        .await;
+        .output();
     match &output {
         Ok(val) => {
             let err2 = str::from_utf8(&val.stderr).unwrap();
             let rt = regex("error:");
             match rt.is_match(err2) {
-                true => log_error(err2).await,
-                false => log_success("Successfully DB Migrated!").await,
+                true => log_error(err2),
+                false => {
+                    log_success("Successfully DB Migrated!");
+                }
             }
         }
         Err(err) => {
@@ -27,38 +29,44 @@ pub async fn process_db_migrate() {
     }
 }
 
-pub async fn process_db_reset() {
+pub fn process_db_reset() {
     let output = Command::new("sea-orm-cli")
         .args(&["migrate", "reset"])
-        .output()
-        .await;
+        .output();
     match &output {
         Ok(val) => {
             let err2 = str::from_utf8(&val.stderr).unwrap();
             let rt = regex("error:");
             match rt.is_match(err2) {
-                true => log_error(err2).await,
-                false => log_success("Successfully DB reset!").await,
+                true => {
+                    log_error(err2);
+                }
+                false => {
+                    log_success("Successfully DB reset!");
+                }
             }
         }
         Err(err) => {
-            panic!("error = {:?}", err)
+            panic!("error = {:?}", err);
         }
     }
 }
 
-pub async fn process_db_refresh() {
+pub fn process_db_refresh() {
     let output = Command::new("sea-orm-cli")
         .args(&["migrate", "refresh"])
-        .output()
-        .await;
+        .output();
     match &output {
         Ok(val) => {
             let err2 = str::from_utf8(&val.stderr).unwrap();
             let rt = regex("error:");
             match rt.is_match(err2) {
-                true => log_error(err2).await,
-                false => log_success("Successfully DB refreshed!").await,
+                true => {
+                    log_error(err2);
+                }
+                false => {
+                    log_success("Successfully DB refreshed!");
+                }
             }
         }
         Err(err) => {
@@ -67,18 +75,22 @@ pub async fn process_db_refresh() {
     }
 }
 
-pub async fn process_db_rollback() {
+pub fn process_db_rollback() {
     let output = Command::new("sea-orm-cli")
         .args(&["migrate", "down"])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err2 = str::from_utf8(&val.stderr).unwrap();
             let rt = regex("error:");
             match rt.is_match(err2) {
-                true => log_error(err2).await,
-                false => log_success("Successfully DB rollbacked!").await,
+                true => {
+                    log_error(err2);
+                }
+                false => {
+                    log_success("Successfully DB rollbacked!");
+                }
             }
         }
         Err(err) => {

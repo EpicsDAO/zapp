@@ -1,44 +1,38 @@
 use crate::style_print::*;
+use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
-pub async fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
+pub fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
     let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
     let output = Command::new("docker")
         .args(&["build", ".", "-t", &gcr_url])
-        .output()
-        .await;
+        .output();
+
     println!("output = {:?}", output);
 }
 
-pub async fn process_docker_push(project_id: &str, service_name: &str, gcr_region: &str) {
+pub fn process_docker_push(project_id: &str, service_name: &str, gcr_region: &str) {
     let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
-    let output = Command::new("docker")
-        .args(&["push", &gcr_url])
-        .output()
-        .await;
+    let output = Command::new("docker").args(&["push", &gcr_url]).output();
+
     println!("output = {:?}", output);
 }
 
-pub async fn create_docker_network() {
+pub fn create_docker_network() {
     let _output = Command::new("docker")
         .args(&["network", "create", "zapp"])
-        .output()
-        .await;
+        .output();
 }
 
-pub async fn process_docker_restart() {
+pub fn process_docker_restart() {
     let _output = Command::new("docker")
         .args(&["rm", "-f", "zapp-psql"])
-        .output()
-        .await;
-    let _output2 = Command::new("zapp")
-        .args(&["docker", "psql"])
-        .output()
-        .await;
+        .output();
+
+    let _output2 = Command::new("zapp").args(&["docker", "psql"]).output();
 }
 
-pub async fn process_docker_psql(service_name: &str) {
+pub fn process_docker_psql(service_name: &str) {
     let underscored_name = service_name.to_string().replace("-", "_");
     let container_name = String::from(service_name) + "-psql";
     let db_name = String::from("POSTGRES_DB=") + &underscored_name + "_db";
@@ -60,8 +54,8 @@ pub async fn process_docker_psql(service_name: &str) {
             "--network=zapp",
             "postgres:14.3-alpine",
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -69,7 +63,7 @@ pub async fn process_docker_psql(service_name: &str) {
             match out.unwrap() {
                 "" => println!("{:?}", err.unwrap().trim()),
                 _ => {
-                    log_success(&format!("PostgreSQL Container Created: {}", out.unwrap())).await;
+                    log_success(&format!("PostgreSQL Container Created: {}", out.unwrap()));
                 }
             }
         }
