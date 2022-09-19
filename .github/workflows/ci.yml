@@ -1,0 +1,59 @@
+name: CI
+
+on: [ push, pull_request ]
+
+env:
+  TOOLCHAIN_CHANNEL: stable
+
+jobs:
+  ci:
+    name: Run continuous integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup rust ${{ env.TOOLCHAIN_CHANNEL }} toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ env.TOOLCHAIN_CHANNEL }}
+          components: clippy, rustfmt
+          override: true
+
+      # https://github.com/actions/cache/blob/main/examples.md#rust---cargo
+      - name: Build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ env.TOOLCHAIN_CHANNEL }}-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Run cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+      # FIXME(@JonasCir) enable clippy later once formatting is done to avoid difficult PR diff
+
+      #- name: Run cargo clippy
+      #  uses: actions-rs/clippy-check@v1
+      #  with:
+      #    token: ${{ secrets.GITHUB_TOKEN }}
+      #    args: -- -D warnings
+
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
