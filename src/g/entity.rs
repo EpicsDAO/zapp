@@ -1,9 +1,9 @@
+use crate::g::{read_dir, to_upper_camel};
+use crate::style_print::log_success;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
-use crate::g::{read_dir, to_upper_camel};
-use crate::style_print::log_success;
 
 pub(in crate::g) async fn process_entity(model: &str, gen_path: &Path) {
     create_entity(model, gen_path).await;
@@ -61,7 +61,12 @@ impl Entity {{
     );
     let mut file = fs::File::create(&file_path).unwrap();
     file.write_all(file_content.as_bytes()).unwrap();
-    log_success(&format!("Successfully created `{}` entity file: {}", model, file_path.display())).await;
+    log_success(&format!(
+        "Successfully created `{}` entity file: {}",
+        model,
+        file_path.display()
+    ))
+    .await;
 }
 
 async fn register_entity(model: &str, gen_path: &Path) {
@@ -82,8 +87,16 @@ async fn register_entity(model: &str, gen_path: &Path) {
     for model in &entity_box {
         let name = model.split(".").collect::<Vec<_>>();
         let content2 = format!("\npub mod {};", &name[0]);
-        let mut add_line = OpenOptions::new().append(true).open(entity_src_lib.as_path()).unwrap();
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(entity_src_lib.as_path())
+            .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
-    log_success(&format!("Successfully registered `{}` entity in {}", model, entity_src_lib.display())).await;
+    log_success(&format!(
+        "Successfully registered `{}` entity in {}",
+        model,
+        entity_src_lib.display()
+    ))
+    .await;
 }

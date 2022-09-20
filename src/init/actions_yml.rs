@@ -1,5 +1,5 @@
 pub async fn action_yml(gcr_region: &str) -> String {
-  let yml = format!("name: ZappService
+    let yml = format!("name: ZappService
 on:
   push:
     branches:
@@ -52,5 +52,5 @@ jobs:
             --set-env-vars='ZAPP_GCP_PROJECT_ID=${{{{ secrets.ZAPP_GCP_PROJECT_ID }}}}' \\
             --set-env-vars='DATABASE_URL=${{{{ secrets.DATABASE_URL }}}}'
 ", gcr_region, gcr_region, gcr_region);
-yml
+    yml
 }

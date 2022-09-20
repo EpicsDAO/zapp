@@ -1,10 +1,10 @@
+use crate::g::{read_dir, to_upper_camel};
 use crate::style_print::*;
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 use std::str;
-use crate::g::{read_dir, to_upper_camel};
 
 pub(in crate::g) async fn process_graphql_mutation(model: &str, gen_path: &Path) {
     create_mutation(model, gen_path).await;
@@ -124,11 +124,12 @@ impl {}Mutation {{
     let mut file = fs::File::create(&file_path).unwrap();
     file.write_all(file_content.as_bytes()).unwrap();
     log_success(&format!(
-        "Successfully created `{}` GraphQL mutation file: {}", model, file_path.display()
+        "Successfully created `{}` GraphQL mutation file: {}",
+        model,
+        file_path.display()
     ))
-        .await;
+    .await;
 }
-
 
 async fn register_mutation(model: &str, gen_path: &Path) {
     let mutation_dir = gen_path.join("src").join("graphql").join("mutation");
@@ -150,12 +151,17 @@ async fn register_mutation(model: &str, gen_path: &Path) {
     for model in &mutation_box {
         let name = model.split(".").collect::<Vec<_>>();
         let content2 = format!("pub mod {};\n", &name[0]);
-        let mut add_line = OpenOptions::new().append(true).open(file_path.as_path()).unwrap();
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path.as_path())
+            .unwrap();
         add_line.write_all(content2.as_bytes()).unwrap();
     }
 
-
-    let mut add_line = OpenOptions::new().append(true).open(file_path.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path.as_path())
+        .unwrap();
     add_line.write_all("\n".as_bytes()).unwrap();
     for model in &mutation_box {
         let name = model.split(".").collect::<Vec<_>>();
@@ -164,11 +170,17 @@ async fn register_mutation(model: &str, gen_path: &Path) {
             &name[0],
             to_upper_camel(&name[0])
         );
-        let mut add_line = OpenOptions::new().append(true).open(file_path.as_path()).unwrap();
+        let mut add_line = OpenOptions::new()
+            .append(true)
+            .open(file_path.as_path())
+            .unwrap();
         add_line.write_all(content3.as_bytes()).unwrap();
     }
     let content4 = b"\n#[derive(async_graphql::MergedObject, Default)]";
-    let mut add_line = OpenOptions::new().append(true).open(file_path.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path.as_path())
+        .unwrap();
     add_line.write_all(content4).unwrap();
     let capital_box = mutation_box
         .iter()
@@ -182,10 +194,15 @@ async fn register_mutation(model: &str, gen_path: &Path) {
         .collect::<Vec<_>>();
 
     let content5 = format!("\npub struct Mutation({});", &last_line.join(", "));
-    let mut add_line = OpenOptions::new().append(true).open(file_path.as_path()).unwrap();
+    let mut add_line = OpenOptions::new()
+        .append(true)
+        .open(file_path.as_path())
+        .unwrap();
     add_line.write_all(&content5.as_bytes()).unwrap();
     log_success(&format!(
-        "Successfully registered GraphQL mutation for `{}` in {}", model, file_path.display()
+        "Successfully registered GraphQL mutation for `{}` in {}",
+        model,
+        file_path.display()
     ))
-        .await;
+    .await;
 }
