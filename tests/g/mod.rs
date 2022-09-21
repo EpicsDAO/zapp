@@ -14,5 +14,4 @@ fn assert_file_equality(resource_dir: &Path, tmp_dir: &Path, path: &str) {
     tmp_file.read_to_string(&mut actual).unwrap();
 
     assert_eq!(actual, expected);
-
 }
