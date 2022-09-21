@@ -1,7 +1,7 @@
 ![ZAPP](https://storage.googleapis.com/zapp-bucket/img/ZAPP-logo.jpeg)
 <p align="center">
-  <a href="https://twitter.com/intent/follow?screen_name=EpicsDAO">
-    <img src="https://img.shields.io/twitter/follow/EpicsDAO.svg?label=Follow%20@EpicsDAO" alt="Follow @EpicsDAO" />
+  <a href="https://twitter.com/intent/follow?screen_name=EpicsDAO2">
+    <img src="https://img.shields.io/twitter/follow/EpicsDAO2.svg?label=Follow%20@EpicsDAO2" alt="Follow @EpicsDAO2" />
   </a>
   <br/>
   <a aria-label="Crate Version" href="https://crates.io/crates/zapp">
