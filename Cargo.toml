@@ -25,6 +25,7 @@ convert_case = "0.5.0"
 spinners = "4.0.0"
 quote = "1.0.20"
 syn = "1.0.98"
+proc-macro2 = { version = "1.0.32", default-features = false }
 prettyplease = "0.1.16"
 
 [dev-dependencies]
