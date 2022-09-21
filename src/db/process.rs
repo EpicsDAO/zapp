@@ -2,7 +2,6 @@ use crate::style_print::*;
 use regex::Regex;
 use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
