@@ -5,12 +5,12 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
-pub(in crate::g) async fn process_entity(model: &str, gen_path: &Path) {
-    create_entity(model, gen_path).await;
-    register_entity(model, gen_path).await;
+pub(in crate::g) fn process_entity(model: &str, gen_path: &Path) {
+    create_entity(model, gen_path);
+    register_entity(model, gen_path);
 }
 
-async fn create_entity(model: &str, gen_path: &Path) {
+fn create_entity(model: &str, gen_path: &Path) {
     let capital_model = to_upper_camel(model);
     let filename = format!("{}.rs", model);
     let file_dir = gen_path.join("entity").join("src");
@@ -65,13 +65,12 @@ impl Entity {{
         "Successfully created `{}` entity file: {}",
         model,
         file_path.display()
-    ))
-    .await;
+    ));
 }
 
-async fn register_entity(model: &str, gen_path: &Path) {
+fn register_entity(model: &str, gen_path: &Path) {
     let entity_dir = gen_path.join("entity").join("src");
-    let entity_files = read_dir(entity_dir.as_path()).await.unwrap();
+    let entity_files = read_dir(entity_dir.as_path()).unwrap();
     let mut entity_box = entity_files
         .iter()
         .cloned()
@@ -97,6 +96,5 @@ async fn register_entity(model: &str, gen_path: &Path) {
         "Successfully registered `{}` entity in {}",
         model,
         entity_src_lib.display()
-    ))
-    .await;
+    ));
 }

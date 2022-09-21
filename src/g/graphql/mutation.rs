@@ -6,12 +6,12 @@ use std::io::Write;
 use std::path::Path;
 use std::str;
 
-pub(in crate::g) async fn process_graphql_mutation(model: &str, gen_path: &Path) {
-    create_mutation(model, gen_path).await;
-    register_mutation(model, gen_path).await;
+pub(in crate::g) fn process_graphql_mutation(model: &str, gen_path: &Path) {
+    create_mutation(model, gen_path);
+    register_mutation(model, gen_path);
 }
 
-async fn create_mutation(model: &str, gen_path: &Path) {
+fn create_mutation(model: &str, gen_path: &Path) {
     let capital_model = to_upper_camel(model);
     let filename = format!("{}.rs", model);
     let file_dir = gen_path.join("src").join("graphql").join("mutation");
@@ -127,13 +127,12 @@ impl {}Mutation {{
         "Successfully created `{}` GraphQL mutation file: {}",
         model,
         file_path.display()
-    ))
-    .await;
+    ));
 }
 
-async fn register_mutation(model: &str, gen_path: &Path) {
+fn register_mutation(model: &str, gen_path: &Path) {
     let mutation_dir = gen_path.join("src").join("graphql").join("mutation");
-    let mutation_files = read_dir(mutation_dir.as_path()).await.unwrap();
+    let mutation_files = read_dir(mutation_dir.as_path()).unwrap();
     let mut mutation_box = mutation_files
         .iter()
         .cloned()
@@ -203,6 +202,5 @@ async fn register_mutation(model: &str, gen_path: &Path) {
         "Successfully registered GraphQL mutation for `{}` in {}",
         model,
         file_path.display()
-    ))
-    .await;
+    ));
 }

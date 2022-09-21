@@ -11,7 +11,7 @@ pub mod entity;
 pub mod graphql;
 pub mod migration;
 
-pub(self) async fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
+pub(self) fn read_dir<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
     Ok(fs::read_dir(path)?
         .filter_map(|entry| {
             let entry = entry.ok()?;
@@ -28,9 +28,9 @@ pub(self) fn to_upper_camel(s: &str) -> String {
     s.to_case(Case::UpperCamel)
 }
 
-pub async fn process_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
-    process_entity(model, gen_path).await;
-    process_migration(model, dt, gen_path).await;
-    process_graphql_query(model, gen_path).await;
-    process_graphql_mutation(model, gen_path).await;
+pub fn process_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+    process_entity(model, gen_path);
+    process_migration(model, dt, gen_path);
+    process_graphql_query(model, gen_path);
+    process_graphql_mutation(model, gen_path);
 }

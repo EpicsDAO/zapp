@@ -5,12 +5,12 @@ use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::Path;
 
-pub(in crate::g) async fn process_graphql_query(model: &str, gen_path: &Path) {
-    create_query(model, gen_path).await;
-    register_query(model, gen_path).await;
+pub(in crate::g) fn process_graphql_query(model: &str, gen_path: &Path) {
+    create_query(model, gen_path);
+    register_query(model, gen_path);
 }
 
-async fn create_query(model: &str, gen_path: &Path) {
+fn create_query(model: &str, gen_path: &Path) {
     let capital_model = to_upper_camel(model);
     let filename = format!("{}.rs", model);
     let query_dir = gen_path.join("src").join("graphql").join("query");
@@ -55,13 +55,12 @@ impl {}Query {{
         "Successfully created `{}` GraphQL query file: {}",
         model,
         model_query.display()
-    ))
-    .await;
+    ));
 }
 
-async fn register_query(model: &str, gen_path: &Path) {
+fn register_query(model: &str, gen_path: &Path) {
     let query_dir = gen_path.join("src").join("graphql").join("query");
-    let files = read_dir(query_dir.as_path()).await.unwrap();
+    let files = read_dir(query_dir.as_path()).unwrap();
     let mut query_box = files
         .iter()
         .cloned()
@@ -125,6 +124,5 @@ async fn register_query(model: &str, gen_path: &Path) {
         "Successfully registered GraphQL query for `{}` in {}",
         model,
         query_mod_file.display()
-    ))
-    .await;
+    ));
 }

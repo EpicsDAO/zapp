@@ -1,15 +1,15 @@
 use crate::constants::*;
 use console::style;
 
-pub async fn log_success(text: &str) {
+pub fn log_success(text: &str) {
     println!("{}{}", COMPLETE_EMOJI, style(text).white().bold());
 }
 
-pub async fn log_error(text: &str) {
+pub fn log_error(text: &str) {
     println!("{}{}", ERROR_EMOJI, style(text).white().bold());
 }
 
-pub async fn log_new(text: &str) {
+pub fn log_new(text: &str) {
     println!(
         "{}{}{}{}{}{}{}{}{}{}{}{}{}",
         LAUNCH_EMOJI,
@@ -28,18 +28,18 @@ pub async fn log_new(text: &str) {
     );
 }
 
-pub async fn log_white(text: &str) {
+pub fn log_white(text: &str) {
     println!("{}", style(text).blue().bold());
 }
 
-pub async fn log_input(text: &str) {
+pub fn log_input(text: &str) {
     println!("{}{}", PAPER_EMOJI, style(text).white().bold());
 }
 
-pub async fn log_time(text: &str) {
+pub fn log_time(text: &str) {
     println!("{}{}", TIME_EMOJI, style(text).white().bold());
 }
 
-pub async fn log_create_file(text: &str) {
+pub fn log_create_file(text: &str) {
     println!("{}{}", FILE_EMOJI, style(text).white().bold());
 }

@@ -1,6 +1,6 @@
-use tokio::process::Command;
+use std::process::Command;
 
-pub async fn process_gcloud_build(project_id: &str, service_name: &str, gcr_region: &str) {
+pub fn process_gcloud_build(project_id: &str, service_name: &str, gcr_region: &str) {
     let gcr_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
     let output = Command::new("gcloud")
         .args(&[
@@ -12,12 +12,12 @@ pub async fn process_gcloud_build(project_id: &str, service_name: &str, gcr_regi
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     println!("output = {:?}", output);
 }
 
-pub async fn process_deploy(project_id: &str, service_name: &str, gcr_region: &str) {
+pub fn process_deploy(project_id: &str, service_name: &str, gcr_region: &str) {
     let img_url = String::from(gcr_region) + "/" + project_id + "/" + service_name;
     println!("{}", &img_url);
     let output = Command::new("gcloud")
@@ -29,7 +29,7 @@ pub async fn process_deploy(project_id: &str, service_name: &str, gcr_region: &s
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     println!("output = {:?}", output);
 }

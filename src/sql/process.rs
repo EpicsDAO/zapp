@@ -4,8 +4,8 @@ use regex::Regex;
 use std::fs;
 use std::io;
 use std::io::Write;
+use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
 #[derive(Debug)]
 pub struct EnvProduction {
@@ -22,8 +22,8 @@ fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
 }
 
-pub async fn process_create_sql(project_id: &str, service_name: &str, region: &str, network: &str) {
-    log_input("Please input your DB Root Password:").await;
+pub fn process_create_sql(project_id: &str, service_name: &str, region: &str, network: &str) {
+    log_input("Please input your DB Root Password:");
     let mut db_password = String::new();
     io::stdin()
         .read_line(&mut db_password)
@@ -33,7 +33,7 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
         .parse()
         .expect("Please input DB Root Password:");
     let zone = String::from(region) + "-b";
-    log_time("Createting Cloud SQL ...\nThis process takes 5 to 10 min.").await;
+    log_time("Createting Cloud SQL ...\nThis process takes 5 to 10 min.");
     let instance_name = String::from(service_name) + "-db";
     let db_version = String::from("--database-version=POSTGRES_14");
     let output = Command::new("gcloud")
@@ -54,8 +54,7 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
 
     match &output {
         Ok(val) => {
@@ -65,14 +64,14 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully created Cloud SQL!").await,
+                false => log_success("Successfully created Cloud SQL!"),
             }
         }
         Err(err) => {
             println!("error = {:?}", err)
         }
     }
-    let internal_ip = get_instance_ip(project_id, service_name, 1).await;
+    let internal_ip = get_instance_ip(project_id, service_name, 1);
     let database_url = String::from("DATABASE_URL=postgres://postgres:")
         + &db_password
         + "@"
@@ -114,10 +113,10 @@ pub async fn process_create_sql(project_id: &str, service_name: &str, region: &s
     file.write_all(env_production.zapp_gcp_region.as_bytes())
         .unwrap();
     file.write_all(env_production.zapp_env.as_bytes()).unwrap();
-    process_setup_secret().await;
+    process_setup_secret();
 }
 
-pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &str) {
+pub fn process_patch_sql(project_id: &str, service_name: &str, action: &str) {
     let instance_name = String::from(service_name) + "-db";
     let activation_policy = match action {
         "start" => "ALWAYS",
@@ -127,7 +126,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
         }
     };
 
-    log_time("Patching Cloud SQL ...\nThis process takes 5 to 10 min.").await;
+    log_time("Patching Cloud SQL ...\nThis process takes 5 to 10 min.");
     let output = Command::new("gcloud")
         .args(&[
             "sql",
@@ -139,8 +138,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
 
     match &output {
         Ok(val) => {
@@ -150,7 +148,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully patched Cloud SQL!").await,
+                false => log_success("Successfully patched Cloud SQL!"),
             }
         }
         Err(err) => {
@@ -159,7 +157,7 @@ pub async fn process_patch_sql(project_id: &str, service_name: &str, action: &st
     }
 }
 
-pub async fn process_restart_sql(project_id: &str, service_name: &str) {
+pub fn process_restart_sql(project_id: &str, service_name: &str) {
     let instance_name = String::from(service_name) + "-db";
     let output = Command::new("gcloud")
         .args(&[
@@ -170,8 +168,8 @@ pub async fn process_restart_sql(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -180,14 +178,14 @@ pub async fn process_restart_sql(project_id: &str, service_name: &str) {
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully restart Cloud SQL!").await,
+                false => log_success("Successfully restart Cloud SQL!"),
             }
         }
         Err(err) => println!("error = {:?}", err),
     }
 }
 
-pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
+pub fn process_create_ip_range(project_id: &str, service_name: &str) {
     let ip_range_name = String::from(service_name) + "-ip-range";
     let network = String::from("--network=") + service_name;
     let output = Command::new("gcloud")
@@ -204,8 +202,8 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -214,14 +212,14 @@ pub async fn process_create_ip_range(project_id: &str, service_name: &str) {
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully created IP range!").await,
+                false => log_success("Successfully created IP range!"),
             }
         }
         Err(err) => println!("error = {:?}", err),
     }
 }
 
-pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str) {
+pub fn process_connect_vpc_connector(project_id: &str, service_name: &str) {
     let ip_range_name = String::from(service_name) + "-ip-range";
     let network = String::from("--network=") + service_name;
     let output = Command::new("gcloud")
@@ -236,8 +234,8 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -246,15 +244,15 @@ pub async fn process_connect_vpc_connector(project_id: &str, service_name: &str)
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully connected to VPC!").await,
+                false => log_success("Successfully connected to VPC!"),
             }
         }
         Err(err) => println!("error = {:?}", err),
     }
 }
 
-pub async fn process_assign_network(project_id: &str, service_name: &str) {
-    log_time("Assign network ...\nThis process takes 5 to 10 min.").await;
+pub fn process_assign_network(project_id: &str, service_name: &str) {
+    log_time("Assign network ...\nThis process takes 5 to 10 min.");
     let instance_name = String::from(service_name) + "-db";
     let network = String::from("--network=") + service_name;
     let output = Command::new("gcloud")
@@ -268,8 +266,7 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
 
     match &output {
         Ok(val) => {
@@ -279,7 +276,7 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
                 true => {
                     panic!("{:?}", err.unwrap())
                 }
-                false => log_success("Successfully Assigned Network!").await,
+                false => log_success("Successfully Assigned Network!"),
             }
         }
         Err(err) => {
@@ -288,7 +285,7 @@ pub async fn process_assign_network(project_id: &str, service_name: &str) {
     }
 }
 
-pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usize) -> String {
+pub fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usize) -> String {
     let instance_name = String::from(service_name) + "-db";
     let mut _internal_ip = String::new();
     let output = Command::new("gcloud")
@@ -302,8 +299,8 @@ pub async fn get_instance_ip(project_id: &str, service_name: &str, ip_type: usiz
             "--format",
             "value(ipAddresses.ipAddress)",
         ])
-        .output()
-        .await;
+        .output();
+
     let _internal_ip = match &output {
         Ok(val) => {
             let ips = str::from_utf8(&val.stdout).unwrap().trim();

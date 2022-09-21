@@ -7,8 +7,8 @@ use std::fs::File;
 use std::io;
 use std::io::Write;
 use std::path::Path;
+use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
@@ -22,9 +22,9 @@ pub struct GcpConfig {
     pub network: String,
 }
 
-pub async fn process_init_gcp_config() {
+pub fn process_init_gcp_config() {
     let msg1 = "Please Input Your GCP Project ID:";
-    log_input(msg1).await;
+    log_input(msg1);
     let mut project_id = String::new();
     io::stdin()
         .read_line(&mut project_id)
@@ -35,7 +35,7 @@ pub async fn process_init_gcp_config() {
         .expect("Please Input Your GCP Project ID:");
 
     let msg2 = "Please Input Your GCP Service Name:";
-    log_input(msg2).await;
+    log_input(msg2);
 
     let mut service_name = String::new();
     io::stdin()
@@ -47,7 +47,7 @@ pub async fn process_init_gcp_config() {
         .expect("Please input your GCP service_name:");
 
     let msg3 = "Please Input Your GCP Region:";
-    log_input(msg3).await;
+    log_input(msg3);
     let mut region = String::new();
     io::stdin()
         .read_line(&mut region)
@@ -58,7 +58,7 @@ pub async fn process_init_gcp_config() {
         .expect("Please Input Your GCP Region:");
 
     let msg4 = "Please Input Your GCP Network:";
-    log_input(msg4).await;
+    log_input(msg4);
     let mut network = String::new();
     io::stdin()
         .read_line(&mut network)
@@ -68,27 +68,27 @@ pub async fn process_init_gcp_config() {
         .parse()
         .expect("Please input your GCP Network:");
 
-    let json_struct = build_gcp_config(project_id, service_name, region, network).await;
-    let result = write_gcp_config(json_struct).await;
+    let json_struct = build_gcp_config(project_id, service_name, region, network);
+    let result = write_gcp_config(json_struct);
     match result {
         Ok(..) => {
-            log_success("Successfully Generated!").await;
-            log_create_file("File Path: ./gcp_config.json").await;
+            log_success("Successfully Generated!");
+            log_create_file("File Path: ./gcp_config.json");
         }
         Err(err) => {
-            log_error(&format!("Failed to Write: {}", err)).await;
+            log_error(&format!("Failed to Write: {}", err));
         }
     }
 }
 
-async fn write_gcp_config(json_struct: GcpConfig) -> std::io::Result<()> {
+fn write_gcp_config(json_struct: GcpConfig) -> std::io::Result<()> {
     let serialized: String = serde_json::to_string_pretty(&json_struct).unwrap();
     let mut file = File::create("gcp_config.json")?;
     file.write_all(serialized.as_bytes())?;
     Ok(())
 }
 
-async fn build_gcp_config(
+fn build_gcp_config(
     project_id: String,
     service_name: String,
     region: String,
@@ -102,7 +102,7 @@ async fn build_gcp_config(
     }
 }
 
-pub async fn build_api_workflow(gcr_region: &str) {
+pub fn build_api_workflow(gcr_region: &str) {
     let workflow_dir = ".github/workflows";
     fs::create_dir_all(workflow_dir).unwrap_or_else(|why| {
         println!("! {:?}", why.kind());
@@ -111,27 +111,24 @@ pub async fn build_api_workflow(gcr_region: &str) {
     let file_exist = Path::new(workflow_yml).exists();
     match file_exist {
         true => {
-            log_error("Error: File already exist!").await;
+            log_error("Error: File already exist!");
         }
         false => {
             let mut file = fs::File::create(workflow_yml).unwrap();
-            file.write_all(action_yml(gcr_region).await.as_bytes())
-                .unwrap();
-            log_success("Successfully created workflow!").await;
+            file.write_all(action_yml(gcr_region).as_bytes()).unwrap();
+            log_success("Successfully created workflow!");
         }
     }
 }
 
-pub async fn dl_zapp(app_name: &str) {
+pub fn dl_zapp(app_name: &str) {
     let version_range = "v0.7";
     let zapp_dl_url = format!(
         "https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz",
         version_range
     );
-    let output = Command::new("curl")
-        .args(&["-OL", &zapp_dl_url])
-        .output()
-        .await;
+    let output = Command::new("curl").args(&["-OL", &zapp_dl_url]).output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -139,7 +136,7 @@ pub async fn dl_zapp(app_name: &str) {
             match rt.is_match(err.unwrap()) {
                 true => {
                     let _ = fs::create_dir(app_name);
-                    unzip_zapp(app_name).await;
+                    unzip_zapp(app_name);
                 }
                 false => {
                     panic!("{:?}", err.unwrap())
@@ -150,12 +147,10 @@ pub async fn dl_zapp(app_name: &str) {
     }
 }
 
-pub async fn unzip_zapp(app_name: &str) {
+pub fn unzip_zapp(app_name: &str) {
     let filename = "zapp-api.tar.gz";
-    let output = Command::new("tar")
-        .args(&["-zxvf", &filename])
-        .output()
-        .await;
+    let output = Command::new("tar").args(&["-zxvf", &filename]).output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -174,11 +169,11 @@ pub async fn unzip_zapp(app_name: &str) {
     }
 }
 
-pub async fn git_init(app_name: &str) {
+pub fn git_init(app_name: &str) {
     let output = Command::new("cd")
         .args(&[&app_name, "&&", "git", "init", "--initial-branch=main"])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(_val) => {
             // println!("{:?}", val);
@@ -187,13 +182,13 @@ pub async fn git_init(app_name: &str) {
     }
 }
 
-pub async fn underscore(s: &str) -> String {
+pub fn underscore(s: &str) -> String {
     s.replace("-", "_")
 }
 
-pub async fn create_dockerfile(app_name: &str) {
+pub fn create_dockerfile(app_name: &str) {
     let filename = format!("{}/Dockerfile", app_name);
-    let underscore_app_name = underscore(app_name).await;
+    let underscore_app_name = underscore(app_name);
     let file_content = format!(
         "FROM rust:1.61 as build
 RUN USER=root cargo new --bin {}
@@ -218,7 +213,7 @@ CMD [\"./{}\"]",
     file.write_all(file_content.as_bytes()).unwrap();
 }
 
-pub async fn create_env(app_name: &str) {
+pub fn create_env(app_name: &str) {
     let filename = format!("{}/.env", app_name);
     let file_content = format!(
         "DATABASE_URL1=postgres://postgres:postgres@localhost:5432/{}_db
@@ -231,18 +226,18 @@ pub async fn create_env(app_name: &str) {
     file.write_all(file_content.as_bytes()).unwrap();
 }
 
-pub async fn endroll(app_name: &str) {
+pub fn endroll(app_name: &str) {
     let text1 = "  ███████╗ █████╗ ██████╗ ██████╗ ";
     let text2 = "  ╚══███╔╝██╔══██╗██╔══██╗██╔══██╗";
     let text3 = "    ███╔╝ ███████║██████╔╝██████╔╝";
     let text4 = "   ███╔╝  ██╔══██║██╔═══╝ ██╔═══╝ ";
     let text5 = "  ███████╗██║  ██║██║     ██║     ";
     let text6 = "  ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝     ";
-    log_white(text1).await;
-    log_white(text2).await;
-    log_white(text3).await;
-    log_white(text4).await;
-    log_white(text5).await;
-    log_white(text6).await;
-    log_new(&format!("\nRust Serverless Framework\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name)).await;
+    log_white(text1);
+    log_white(text2);
+    log_white(text3);
+    log_white(text4);
+    log_white(text5);
+    log_white(text6);
+    log_new(&format!("\nRust Serverless Framework\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name));
 }

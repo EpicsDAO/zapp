@@ -1,4 +1,4 @@
-pub async fn action_yml(gcr_region: &str) -> String {
+pub fn action_yml(gcr_region: &str) -> String {
     let yml = format!("name: ZappService
 on:
   push:

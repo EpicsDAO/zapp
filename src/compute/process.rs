@@ -1,13 +1,13 @@
 use crate::style_print::*;
 use regex::Regex;
+use std::process::Command;
 use std::str;
-use tokio::process::Command;
 
 fn regex(re_str: &str) -> Regex {
     Regex::new(re_str).unwrap()
 }
 
-pub async fn process_create_network(project_id: &str, service_name: &str) {
+pub fn process_create_network(project_id: &str, service_name: &str) {
     let output = Command::new("gcloud")
         .args(&[
             "compute",
@@ -17,8 +17,8 @@ pub async fn process_create_network(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -28,7 +28,7 @@ pub async fn process_create_network(project_id: &str, service_name: &str) {
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Network!").await;
+                    log_success("Successfully created Network!");
                 }
             }
         }
@@ -36,7 +36,7 @@ pub async fn process_create_network(project_id: &str, service_name: &str) {
     }
 }
 
-pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
+pub fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
     let firewall = String::from(service_name) + "-tcp";
     let output = Command::new("gcloud")
         .args(&[
@@ -53,8 +53,8 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -64,7 +64,7 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Firewall TCP Rule!").await;
+                    log_success("Successfully created Firewall TCP Rule!");
                 }
             }
         }
@@ -72,7 +72,7 @@ pub async fn process_create_firewall_tcp(project_id: &str, service_name: &str) {
     }
 }
 
-pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
+pub fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
     let firewall = String::from(service_name) + "-ssh";
     let output = Command::new("gcloud")
         .args(&[
@@ -87,8 +87,8 @@ pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -98,7 +98,7 @@ pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Firewall SSH Rule!").await;
+                    log_success("Successfully created Firewall SSH Rule!");
                 }
             }
         }
@@ -106,7 +106,7 @@ pub async fn process_create_firewall_ssh(project_id: &str, service_name: &str) {
     }
 }
 
-pub async fn process_create_subnet(project_id: &str, service_name: &str, region: &str) {
+pub fn process_create_subnet(project_id: &str, service_name: &str, region: &str) {
     let subnet = String::from(service_name) + "-subnet";
     let output = Command::new("gcloud")
         .args(&[
@@ -124,8 +124,8 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -135,7 +135,7 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Subnet!").await;
+                    log_success("Successfully created Subnet!");
                 }
             }
         }
@@ -143,7 +143,7 @@ pub async fn process_create_subnet(project_id: &str, service_name: &str, region:
     }
 }
 
-pub async fn process_create_connector(project_id: &str, service_name: &str, region: &str) {
+pub fn process_create_connector(project_id: &str, service_name: &str, region: &str) {
     let subnet = String::from(service_name) + "-subnet";
     let output = Command::new("gcloud")
         .args(&[
@@ -162,8 +162,8 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -173,7 +173,7 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created VPC Connector!").await;
+                    log_success("Successfully created VPC Connector!");
                 }
             }
         }
@@ -181,7 +181,7 @@ pub async fn process_create_connector(project_id: &str, service_name: &str, regi
     }
 }
 
-pub async fn process_create_router(project_id: &str, service_name: &str, region: &str) {
+pub fn process_create_router(project_id: &str, service_name: &str, region: &str) {
     let router = String::from(service_name) + "-router";
     let output = Command::new("gcloud")
         .args(&[
@@ -196,8 +196,8 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -207,7 +207,7 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Router!").await;
+                    log_success("Successfully created Router!");
                 }
             }
         }
@@ -215,7 +215,7 @@ pub async fn process_create_router(project_id: &str, service_name: &str, region:
     }
 }
 
-pub async fn process_create_external_ip(project_id: &str, service_name: &str, region: &str) {
+pub fn process_create_external_ip(project_id: &str, service_name: &str, region: &str) {
     let external_ip = String::from(service_name) + "-ip";
     let output = Command::new("gcloud")
         .args(&[
@@ -228,8 +228,8 @@ pub async fn process_create_external_ip(project_id: &str, service_name: &str, re
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -239,7 +239,7 @@ pub async fn process_create_external_ip(project_id: &str, service_name: &str, re
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created External IP!").await;
+                    log_success("Successfully created External IP!");
                 }
             }
         }
@@ -247,7 +247,7 @@ pub async fn process_create_external_ip(project_id: &str, service_name: &str, re
     }
 }
 
-pub async fn process_create_nat(project_id: &str, service_name: &str, region: &str) {
+pub fn process_create_nat(project_id: &str, service_name: &str, region: &str) {
     let nat = String::from(service_name) + "-nat";
     let router = String::from(service_name) + "-router";
     let nat_custom_subnet_ip_ranges = String::from(service_name) + "-subnet";
@@ -270,8 +270,8 @@ pub async fn process_create_nat(project_id: &str, service_name: &str, region: &s
             "--project",
             project_id,
         ])
-        .output()
-        .await;
+        .output();
+
     match &output {
         Ok(val) => {
             let err = str::from_utf8(&val.stderr);
@@ -281,7 +281,7 @@ pub async fn process_create_nat(project_id: &str, service_name: &str, region: &s
                     panic!("{:?}", err.unwrap())
                 }
                 false => {
-                    log_success("Successfully created Cloud NAT!").await;
+                    log_success("Successfully created Cloud NAT!");
                 }
             }
         }
