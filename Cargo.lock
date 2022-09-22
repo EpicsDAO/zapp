@@ -556,6 +556,7 @@ dependencies = [
  "console",
  "convert_case",
  "prettyplease",
+ "proc-macro2",
  "quote",
  "regex",
  "serde",
