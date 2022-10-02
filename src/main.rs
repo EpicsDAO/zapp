@@ -135,9 +135,7 @@ fn main() {
             let docker_cmd = docker.command.unwrap_or(DockerCommands::Help);
             match docker_cmd {
                 DockerCommands::Psql => {
-                    let gcp = get_gcp();
-                    create_docker_network();
-                    process_docker_psql(&gcp.service_name);
+                    process_psql_docker();
                 }
                 DockerCommands::Build => {
                     let gcp = get_gcp();
@@ -224,6 +222,8 @@ fn main() {
         }
     }
 }
+
+
 
 pub fn get_gcp() -> GcpConfig {
     let file_name = "gcp_config.json";
