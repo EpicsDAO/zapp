@@ -49,7 +49,7 @@ pub(self) fn emit_generated_code(
     file_path
 }
 
-pub fn process_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+pub fn handle_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     process_entity(model, gen_path);
     process_migration(model, dt, gen_path);
     process_graphql_mutation(model, gen_path);

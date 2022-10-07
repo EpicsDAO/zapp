@@ -8,6 +8,7 @@ license = "Apache-2.0"
 keywords = ["Serverless", "GraphQL", "Async", "PostgreSQL", "Framework"]
 homepage = "https://zapp.epics.dev/"
 repository = "https://github.com/EpicsDAO/zapp"
+rust-version = "1.64.0"
 
 [[bin]]
 name = "zapp"
@@ -17,7 +18,6 @@ path = "src/main.rs"
 clap = { version = "3.1.15", features = ["derive", "cargo"] }
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
-serde_yaml = "0.8.24"
 console = "0.15.0"
 regex = "1.5.6"
 chrono = "0.4"
@@ -27,6 +27,10 @@ quote = "1.0.20"
 syn = "1.0.98"
 proc-macro2 = { version = "1.0.32", default-features = false }
 prettyplease = "0.1.16"
+# use sea-orm CLI features directly without running the binary
+sea-orm-cli = "0.9.2"
 
 [dev-dependencies]
 tempdir = "0.3.7"
+walkdir = "2.3.2"
+itertools = "0.10.5"

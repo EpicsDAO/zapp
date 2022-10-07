@@ -22,6 +22,7 @@ pub(super) fn create_entity(model: &str, entity_src_dir: &Path) {
 
 fn create_model_tokens(model_str: &str) -> TokenStream {
     let model = format_ident!("{}", model_str);
+    #[allow(unused_variables)]
     let cap_model = format_ident!("{}", to_upper_camel(model_str));
 
     quote! {

@@ -14,6 +14,7 @@ use zapp::g::*;
 use zapp::gh::*;
 use zapp::iam::*;
 use zapp::init::*;
+use zapp::new::handle_new;
 use zapp::run::*;
 use zapp::sql::*;
 use zapp::style_print::*;
@@ -22,10 +23,8 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::New { app_name } => {
-            dl_zapp(&app_name);
-            create_dockerfile(&app_name);
-            create_env(&app_name);
-            endroll(&app_name);
+            let current_dir = current_dir().unwrap();
+            handle_new(&app_name, &current_dir);
         }
         Commands::Gcloud(gcloud) => {
             let gcp = get_gcp();
@@ -190,7 +189,7 @@ fn main() {
                     let gen_path_buf = path.unwrap_or_else(|| current_dir().unwrap());
                     let gen_path = gen_path_buf.as_path();
                     let date = Local::now();
-                    process_g(&model, date.naive_local(), gen_path);
+                    handle_g(&model, date.naive_local(), gen_path);
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";
@@ -222,8 +221,6 @@ fn main() {
         }
     }
 }
-
-
 
 pub fn get_gcp() -> GcpConfig {
     let file_name = "gcp_config.json";
