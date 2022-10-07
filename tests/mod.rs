@@ -1,1 +1,1 @@
-mod g;
+mod gen;

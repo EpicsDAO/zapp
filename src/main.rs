@@ -4,13 +4,13 @@ use std::env::current_dir;
 use std::fs::File;
 use std::io::BufReader;
 use zapp::cli::{
-    Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GCommands, GcloudCommands,
-    GcpConfig, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
+    Cli, Commands, ComputeCommands, DbCommands, DockerCommands, GcloudCommands, GcpConfig,
+    GenCommands, GhCommands, IamCommands, InitCommands, RunCommands, SqlCommands,
 };
 use zapp::compute::*;
 use zapp::db::*;
 use zapp::docker::*;
-use zapp::g::*;
+use zapp::gen::*;
 use zapp::gh::*;
 use zapp::iam::*;
 use zapp::init::*;
@@ -183,14 +183,14 @@ fn main() {
                 }
             }
         }
-        Commands::G(g) => {
-            let g_cmd = g.command.unwrap_or(GCommands::Help);
-            match g_cmd {
-                GCommands::Model { model, path } => {
+        Commands::Gen(gen) => {
+            let gen_cmd = gen.command.unwrap_or(GenCommands::Help);
+            match gen_cmd {
+                GenCommands::Model { model, path } => {
                     let gen_path_buf = path.unwrap_or_else(|| current_dir().unwrap());
                     let gen_path = gen_path_buf.as_path();
                     let date = Local::now();
-                    process_g(&model, date.naive_local(), gen_path);
+                    handle_gen(&model, date.naive_local(), gen_path);
                 }
                 _ => {
                     let log = "To see example;\n\n $zapp run --help";
@@ -222,8 +222,6 @@ fn main() {
         }
     }
 }
-
-
 
 pub fn get_gcp() -> GcpConfig {
     let file_name = "gcp_config.json";

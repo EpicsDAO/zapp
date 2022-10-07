@@ -47,7 +47,7 @@ pub enum Commands {
     Compute(Compute),
     Docker(Docker),
     Sql(Sql),
-    G(G),
+    Gen(Gen),
     Db(Db),
     New { app_name: String },
     Gcloud(Gcloud),
@@ -104,9 +104,9 @@ pub struct Sql {
 
 #[derive(Debug, Args)]
 #[clap(args_conflicts_with_subcommands = true)]
-pub struct G {
+pub struct Gen {
     #[clap(subcommand)]
-    pub command: Option<GCommands>,
+    pub command: Option<GenCommands>,
 }
 
 #[derive(Debug, Args)]
@@ -174,7 +174,7 @@ pub enum SqlCommands {
 }
 
 #[derive(Debug, Subcommand)]
-pub enum GCommands {
+pub enum GenCommands {
     Model {
         model: String,
         #[clap(parse(from_os_str), short, long)]

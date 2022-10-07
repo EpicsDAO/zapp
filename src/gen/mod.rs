@@ -1,7 +1,7 @@
-use crate::g::entity::process_entity;
-use crate::g::graphql::mutation::process_graphql_mutation;
-use crate::g::graphql::query::process_graphql_query;
-use crate::g::migration::process_migration;
+use crate::gen::entity::process_entity;
+use crate::gen::graphql::mutation::process_graphql_mutation;
+use crate::gen::graphql::query::process_graphql_query;
+use crate::gen::migration::process_migration;
 use chrono::NaiveDateTime;
 use convert_case::{Case, Casing};
 use proc_macro2::TokenStream;
@@ -49,7 +49,7 @@ pub(self) fn emit_generated_code(
     file_path
 }
 
-pub fn process_g(model: &str, dt: NaiveDateTime, gen_path: &Path) {
+pub fn handle_gen(model: &str, dt: NaiveDateTime, gen_path: &Path) {
     process_entity(model, gen_path);
     process_migration(model, dt, gen_path);
     process_graphql_mutation(model, gen_path);
