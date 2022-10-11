@@ -7,7 +7,7 @@ use zapp::gen::handle_gen;
 #[test]
 fn gen_one_user_model() {
     let tmp_dir = TempDir::new("zapp-gen-integration-tests").unwrap();
-    let resource_dir = Path::new("tests/g/resources/gen_one_user_model");
+    let resource_dir = Path::new("tests/gen/resources/gen_one_user_model");
 
     let test_dt = NaiveDate::from_ymd(2022, 7, 16).and_hms(23, 39, 33);
 
@@ -24,8 +24,8 @@ fn gen_one_user_model() {
     assert_file_equality(resource_dir, tmp_dir.path(), "migration/src/lib.rs");
 
     assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/query/user.rs");
-    assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/query/gen");
+    assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/query/mod.rs");
 
     assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/mutation/user.rs");
-    assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/mutation/gen");
+    assert_file_equality(resource_dir, tmp_dir.path(), "src/graphql/mutation/mod.rs");
 }
