@@ -1,17 +1,17 @@
-use crate::g::assert_file_equality;
+use crate::gen::assert_file_equality;
 use chrono::NaiveDate;
 use std::path::Path;
 use tempdir::TempDir;
-use zapp::g::process_g;
+use zapp::gen::handle_gen;
 
 #[test]
 fn gen_one_user_model() {
-    let tmp_dir = TempDir::new("zapp-g-integration-tests").unwrap();
-    let resource_dir = Path::new("tests/g/resources/gen_one_user_model");
+    let tmp_dir = TempDir::new("zapp-gen-integration-tests").unwrap();
+    let resource_dir = Path::new("tests/gen/resources/gen_one_user_model");
 
     let test_dt = NaiveDate::from_ymd(2022, 7, 16).and_hms(23, 39, 33);
 
-    process_g("user", test_dt, tmp_dir.path());
+    handle_gen("user", test_dt, tmp_dir.path());
 
     assert_file_equality(resource_dir, tmp_dir.path(), "entity/src/user.rs");
     assert_file_equality(resource_dir, tmp_dir.path(), "entity/src/lib.rs");

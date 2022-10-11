@@ -2,7 +2,6 @@ use crate::style_print::*;
 use std::process::Command;
 use std::str;
 
-
 pub fn process_psql_docker() {
     create_docker_network();
     process_docker_psql("zapp-psql");

@@ -1,4 +1,4 @@
-use crate::g::{emit_generated_code, read_dir};
+use crate::gen::{emit_generated_code, read_dir};
 use crate::style_print::log_success;
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};

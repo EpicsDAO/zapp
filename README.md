@@ -84,7 +84,7 @@ SUBCOMMANDS:
     compute    
     db         
     docker     
-    g          
+    gen       
     gcloud     
     gh         
     help       Print this message or the help of the given subcommand(s)
@@ -137,7 +137,7 @@ Now go to
 
 Create Model
 ```bash
-$ zapp g model user
+$ zapp gen model user
 ✅ Successfully created migration file: migration/src/m20220613_102512_create_user_table.rs
 ✅ Successfully added route to `migration/src/lib.rs`
 ✅ Successfully created entity file: entity/src/user.rs

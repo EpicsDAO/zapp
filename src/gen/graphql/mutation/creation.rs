@@ -1,5 +1,7 @@
-use crate::g::emit_generated_code;
-use crate::{g::to_upper_camel, style_print::*};
+use crate::{
+    gen::{emit_generated_code, to_upper_camel},
+    style_print::*,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use std::path::Path;
