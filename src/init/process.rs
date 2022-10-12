@@ -1,6 +1,5 @@
 use super::actions_yml::*;
 use crate::style_print::*;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
@@ -9,10 +8,6 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use std::str;
-
-fn regex(re_str: &str) -> Regex {
-    Regex::new(re_str).unwrap()
-}
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GcpConfig {
@@ -121,54 +116,6 @@ pub fn build_api_workflow(gcr_region: &str) {
     }
 }
 
-pub fn dl_zapp(app_name: &str) {
-    let version_range = "v0.7";
-    let zapp_dl_url = format!(
-        "https://storage.googleapis.com/zapp-bucket/zapp-api-template/{}/zapp-api.tar.gz",
-        version_range
-    );
-    let output = Command::new("curl").args(&["-OL", &zapp_dl_url]).output();
-
-    match &output {
-        Ok(val) => {
-            let err = str::from_utf8(&val.stderr);
-            let rt = regex("Received");
-            match rt.is_match(err.unwrap()) {
-                true => {
-                    let _ = fs::create_dir(app_name);
-                    unzip_zapp(app_name);
-                }
-                false => {
-                    panic!("{:?}", err.unwrap())
-                }
-            }
-        }
-        Err(err) => println!("error = {:?}", err),
-    }
-}
-
-pub fn unzip_zapp(app_name: &str) {
-    let filename = "zapp-api.tar.gz";
-    let output = Command::new("tar").args(&["-zxvf", &filename]).output();
-
-    match &output {
-        Ok(val) => {
-            let err = str::from_utf8(&val.stderr);
-            let rt = regex("could not");
-            match rt.is_match(err.unwrap()) {
-                true => {
-                    panic!("{:?}", err.unwrap())
-                }
-                false => {
-                    let _ = fs::rename("zapp-api", app_name);
-                    let _ = fs::remove_file(&filename);
-                }
-            }
-        }
-        Err(err) => println!("error = {:?}", err),
-    }
-}
-
 pub fn git_init(app_name: &str) {
     let output = Command::new("cd")
         .args(&[&app_name, "&&", "git", "init", "--initial-branch=main"])
@@ -180,64 +127,4 @@ pub fn git_init(app_name: &str) {
         }
         Err(err) => println!("error = {:?}", err),
     }
-}
-
-pub fn underscore(s: &str) -> String {
-    s.replace("-", "_")
-}
-
-pub fn create_dockerfile(app_name: &str) {
-    let filename = format!("{}/Dockerfile", app_name);
-    let underscore_app_name = underscore(app_name);
-    let file_content = format!(
-        "FROM rust:1.61 as build
-RUN USER=root cargo new --bin {}
-WORKDIR /{}
-COPY entity entity
-COPY migration migration
-COPY Cargo.toml Cargo.toml
-RUN cargo build --release
-COPY ./src ./src
-COPY entity/src entity/src
-COPY migration/src migration/src
-RUN rm -f target/release/deps/{}*
-RUN cargo build --release
-
-FROM debian:11.3
-COPY --from=build /{}/target/release/{} .
-
-CMD [\"./{}\"]",
-        app_name, app_name, &underscore_app_name, app_name, app_name, app_name
-    );
-    let mut file = fs::File::create(&filename).unwrap();
-    file.write_all(file_content.as_bytes()).unwrap();
-}
-
-pub fn create_env(app_name: &str) {
-    let filename = format!("{}/.env", app_name);
-    let file_content = format!(
-        "DATABASE_URL1=postgres://postgres:postgres@localhost:5432/{}_db
-    PORT=3000
-    SECRET=xxxxxxxxxxxxxx
-    ZAPP_ENV=development",
-        app_name
-    );
-    let mut file = fs::File::create(&filename).unwrap();
-    file.write_all(file_content.as_bytes()).unwrap();
-}
-
-pub fn endroll(app_name: &str) {
-    let text1 = "  ███████╗ █████╗ ██████╗ ██████╗ ";
-    let text2 = "  ╚══███╔╝██╔══██╗██╔══██╗██╔══██╗";
-    let text3 = "    ███╔╝ ███████║██████╔╝██████╔╝";
-    let text4 = "   ███╔╝  ██╔══██║██╔═══╝ ██╔═══╝ ";
-    let text5 = "  ███████╗██║  ██║██║     ██║     ";
-    let text6 = "  ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝     ";
-    log_white(text1);
-    log_white(text2);
-    log_white(text3);
-    log_white(text4);
-    log_white(text5);
-    log_white(text6);
-    log_new(&format!("\nRust Serverless Framework\n$ cd {}\n$ zapp docker psql\n$ cargo run\n\nGo to : http://localhost:3000/api/graphql", app_name));
 }

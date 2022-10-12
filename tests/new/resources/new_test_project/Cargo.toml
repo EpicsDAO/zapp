@@ -1,0 +1,42 @@
+[package]
+name = "new_test_project"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.64"
+
+[workspace]
+members = [".", "entity", "migration"]
+
+[workspace.dependencies]
+# graphql base library
+async-graphql = { version = "4.0.13", features = ["chrono"] }
+# graphql integration for axum web framework
+async-graphql-axum = "4.0.13"
+# async std lib: used by migration crate
+async-std = { version = "1.12.0", features = ["attributes", "tokio1"] }
+# our general web framework
+axum = "^0.5.1"
+# read dotenv files in main.rs
+dotenv = "0.15.0"
+# generated local entities
+entity = { path = "entity" }
+# generated local migrations
+migration = { path = "migration" }
+# database connection and orm
+sea-orm = { version = "0.9.2", features = ["runtime-tokio-native-tls", "sqlx-postgres"] }
+# migrate database before startup
+sea-orm-migration = "0.9.2"
+# asnyc runtime: used by main.rs
+tokio = { version = "1.0", features = ["full"] }
+
+[dependencies]
+async-graphql = { workspace = true }
+async-graphql-axum = { workspace = true }
+async-std = { workspace = true }
+axum = {workspace = true}
+dotenv = { workspace = true }
+entity = { workspace = true }
+migration = { workspace = true }
+sea-orm = { workspace = true }
+sea-orm-migration = { workspace = true }
+tokio = { workspace = true }

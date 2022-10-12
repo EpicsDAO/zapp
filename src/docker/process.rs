@@ -2,10 +2,9 @@ use crate::style_print::*;
 use std::process::Command;
 use std::str;
 
-
 pub fn process_psql_docker() {
     create_docker_network();
-    process_docker_psql("zapp-psql");
+    process_docker_psql();
 }
 
 pub fn process_docker_build(project_id: &str, service_name: &str, gcr_region: &str) {
@@ -38,25 +37,18 @@ pub fn process_docker_restart() {
     let _output2 = Command::new("zapp").args(&["docker", "psql"]).output();
 }
 
-fn process_docker_psql(service_name: &str) {
-    let underscored_name = service_name.to_string().replace("-", "_");
-    let container_name = String::from(service_name) + "-psql";
-    let db_name = String::from("POSTGRES_DB=") + &underscored_name + "_db";
+fn process_docker_psql() {
     let output = Command::new("docker")
         .args(&[
             "run",
             "--rm",
             "-d",
-            "--name",
-            &container_name,
             "-p",
             "5432:5432",
             "-e",
             "POSTGRES_USER=postgres",
             "-e",
             "POSTGRES_PASSWORD=postgres",
-            "-e",
-            &db_name,
             "--network=zapp",
             "postgres:14.3-alpine",
         ])

@@ -8,6 +8,7 @@ pub mod gcloud;
 pub mod gh;
 pub mod iam;
 pub mod init;
+pub mod new;
 pub mod run;
 pub mod sql;
 pub mod style_print;
